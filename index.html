@@ -68,8 +68,8 @@
     <div id="login-view" class="fixed inset-0 bg-coosajo-blue flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md mx-4">
             <div class="text-center mb-8">
-                <!-- Se llama al logo exactamente con el nombre solicitado -->
-                <img src="logo coosajo baja resolución.png" alt="Logo Coosajo" class="h-20 mx-auto mb-4 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x80/ffffff/172e59?text=COOSAJO';">
+                <!-- Se llama al nuevo nombre de logo -->
+                <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo Coosajo" class="h-20 mx-auto mb-4 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x80/ffffff/172e59?text=COOSAJO';">
                 <h2 class="text-2xl font-extrabold text-gray-800">Acceso al Reporte</h2>
                 <p class="text-sm text-gray-500 mt-1">Vinculación Social</p>
             </div>
@@ -85,7 +85,7 @@
                 <div id="login-error" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200 font-medium"></div>
                 <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition shadow-md">Ingresar</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6 font-mono">Conectado a Firebase Database</p>
+            <p class="text-xs text-center text-gray-400 mt-6 font-mono">Conectado a tu Firebase Real</p>
         </div>
     </div>
 
@@ -95,7 +95,7 @@
         <header class="bg-coosajo-blue text-white shadow-md print:shadow-none print:bg-transparent print:text-black">
             <div class="max-w-[1400px] mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
                 <div class="flex items-center mb-4 md:mb-0">
-                    <img src="logo coosajo baja resolución.png" alt="Logo Coosajo" class="h-12 w-auto bg-white p-1 rounded" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x60/ffffff/172e59?text=COOSAJO';">
+                    <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo Coosajo" class="h-12 w-auto bg-white p-1 rounded" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x60/ffffff/172e59?text=COOSAJO';">
                     <div class="ml-4">
                         <h1 class="text-xl font-bold">Reporte de Publicaciones</h1>
                         <p class="text-coosajo-green font-semibold text-sm print:text-gray-600">Vinculación Social</p>
@@ -129,7 +129,7 @@
             
             <div id="loading-indicator" class="text-center py-12">
                 <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-4 border-coosajo-green"></div>
-                <p class="mt-4 text-coosajo-blue font-bold">Sincronizando con la base de datos...</p>
+                <p class="mt-4 text-coosajo-blue font-bold">Sincronizando con tu base de datos...</p>
             </div>
 
             <div id="tables-container" class="hidden">
@@ -182,13 +182,14 @@
     <!-- Scripts Data y Firebase Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
         // 1. CONFIGURACIÓN FIREBASE Y DATOS
         // ==========================================
-        const miFirebaseConfig = {
+        // Forzamos usar tu Firebase SIEMPRE (incluso en la previsualización)
+        const firebaseConfig = {
             apiKey: "AIzaSyACfn6C6_XqLDQI29f6uHUUwlCQkSCXNYk",
             authDomain: "costos-comunicacion-digital.firebaseapp.com",
             databaseURL: "https://costos-comunicacion-digital-default-rtdb.firebaseio.com",
@@ -198,14 +199,10 @@
             appId: "1:299496606379:web:a4d6609ff79eebff0c85ee"
         };
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : miFirebaseConfig;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'coosajo-reportes';
-        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        let currentUserId = null;
         let unsubscribeSnapshot = null;
         let debounceTimers = {};
 
@@ -312,6 +309,7 @@
             
             errorEl.classList.add('hidden');
 
+            // Validación estricta
             if (userVal !== 'sjemartinez' || passVal !== 'Coosajo2041') {
                 errorEl.innerText = "Usuario o contraseña incorrectos.";
                 errorEl.classList.remove('hidden');
@@ -322,25 +320,12 @@
             btn.innerText = "Conectando...";
 
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    // Entorno de Preview
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    // Entorno de Producción (GitHub)
-                    const email = "sjemartinez@coosajo.com";
-                    try {
-                        await signInWithEmailAndPassword(auth, email, passVal);
-                    } catch (err) {
-                        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-                            await createUserWithEmailAndPassword(auth, email, passVal);
-                        } else {
-                            throw err;
-                        }
-                    }
-                }
+                // Al validar manualmente que eres tú, iniciamos sesión anónima en Firebase
+                // para que tus reglas (request.auth != null) te dejen guardar datos
+                await signInAnonymously(auth);
             } catch (error) {
                 console.error(error);
-                errorEl.innerText = "Error de conexión con Firebase.";
+                errorEl.innerText = "Error de red al conectar con Firebase.";
                 errorEl.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerText = "Ingresar";
@@ -355,11 +340,11 @@
         // ==========================================
         // 3. LOGICA DE INTERFAZ Y AUTOGUARDADO
         // ==========================================
+        // Todo se guardará en la ruta: reportes/sjemartinez/posts/[id]
         window.saveData = (id, type, value) => {
-            if (!currentUserId) return;
             clearTimeout(debounceTimers[`${id}_${type}`]);
             debounceTimers[`${id}_${type}`] = setTimeout(() => {
-                const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'posts', id);
+                const docRef = doc(db, 'reportes', 'sjemartinez', 'posts', id);
                 setDoc(docRef, { [type]: value }, { merge: true }).catch(err => console.error(err));
             }, 800);
         };
@@ -476,14 +461,13 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // UI de Acceso
-                currentUserId = user.uid;
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('app-view').classList.remove('hidden');
                 
                 buildUI();
 
-                // Conectar Listener a Firebase
-                const postsRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'posts');
+                // Escuchamos la ruta fija de sjemartinez
+                const postsRef = collection(db, 'reportes', 'sjemartinez', 'posts');
                 unsubscribeSnapshot = onSnapshot(postsRef, (snapshot) => {
                     document.getElementById('loading-indicator').classList.add('hidden');
                     document.getElementById('tables-container').classList.remove('hidden');
@@ -515,7 +499,6 @@
 
             } else {
                 // UI de Salida
-                currentUserId = null;
                 document.getElementById('login-view').classList.remove('hidden');
                 document.getElementById('app-view').classList.add('hidden');
                 if (unsubscribeSnapshot) unsubscribeSnapshot();
