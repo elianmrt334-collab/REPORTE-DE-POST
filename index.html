@@ -79,7 +79,7 @@
                     ACCEDER AL REPORTE
                 </button>
             </form>
-            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v3.1</p>
+            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v3.2</p>
         </div>
     </div>
 
@@ -132,13 +132,12 @@
                         <div class="h-8 w-8 bg-coosajo-blue rounded-lg animate-pulse"></div>
                     </div>
                 </div>
-                <p class="mt-8 text-coosajo-blue font-black text-2xl tracking-tighter">Sincronizando Base de Datos...</p>
-                <p class="text-slate-400 text-sm mt-2 font-medium">Buscando registros en la nube</p>
+                <p class="mt-8 text-coosajo-blue font-black text-2xl tracking-tighter">Sincronizando con la Nube...</p>
                 <div id="error-db-msg" class="hidden mt-6 text-red-500 font-bold bg-red-50 p-4 rounded-xl max-w-sm mx-auto border border-red-100"></div>
             </div>
 
-            <div id="tables-container" class="hidden space-y-16">
-                <!-- ABRIL -->
+            <div id="tables-container" class="hidden space-y-20">
+                <!-- SECCIÓN ABRIL -->
                 <section id="section-abril" class="fade-in">
                     <div class="flex items-center gap-6 mb-8">
                         <h2 class="text-3xl font-black text-coosajo-blue uppercase tracking-tighter">Mes de Abril</h2>
@@ -148,11 +147,11 @@
                         <table class="min-w-full text-left text-sm">
                             <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-[0.15em] font-black">
                                 <tr>
-                                    <th class="p-5 w-28">Fecha</th>
-                                    <th class="p-5 w-36">Eje Social</th>
-                                    <th class="p-5 w-56">Frase Propuesta</th>
+                                    <th class="p-5 w-24">Fecha</th>
+                                    <th class="p-5 w-32">Eje Social</th>
+                                    <th class="p-5 w-52">Frase Propuesta</th>
                                     <th class="p-5 w-44">Estado</th>
-                                    <th class="p-5 min-w-[250px]">Copy Final Publicado</th>
+                                    <th class="p-5 min-w-[260px]">Copy Final Publicado</th>
                                     <th class="p-5 min-w-[200px]">Justificación</th>
                                     <th class="p-5 w-44">Evidencia</th>
                                 </tr>
@@ -162,7 +161,7 @@
                     </div>
                 </section>
 
-                <!-- MARZO -->
+                <!-- SECCIÓN MARZO -->
                 <section id="section-marzo" class="fade-in">
                     <div class="flex items-center gap-6 mb-8">
                         <h2 class="text-3xl font-black text-coosajo-blue uppercase tracking-tighter">Mes de Marzo</h2>
@@ -172,10 +171,10 @@
                         <table class="min-w-full text-left text-sm">
                             <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-[0.15em] font-black">
                                 <tr>
-                                    <th class="p-5 w-56">Frase Original</th>
-                                    <th class="p-5 w-56">Copy de Referencia</th>
+                                    <th class="p-5 w-52">Frase Original</th>
+                                    <th class="p-5 w-52">Copy de Referencia</th>
                                     <th class="p-5 w-44">Estado</th>
-                                    <th class="p-5 min-w-[250px]">Copy Final Publicado</th>
+                                    <th class="p-5 min-w-[260px]">Copy Final Publicado</th>
                                     <th class="p-5 min-w-[200px]">Justificación</th>
                                     <th class="p-5 w-44">Evidencia</th>
                                 </tr>
@@ -257,7 +256,7 @@
             { id: "M13", frase: "Herramientas digitales abren nuevas puertas.", copy: "RED: Conectando con conocimiento que impulsa." }
         ];
 
-        // FUNCIONES GLOBALES
+        // FUNCIONES CORE
         window.saveData = async (id, type, value) => {
             if (!auth.currentUser) return;
             clearTimeout(debounceTimers[`${id}_${type}`]);
@@ -266,7 +265,7 @@
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'registros', id);
                     await setDoc(docRef, { [type]: value }, { merge: true });
                 } catch (err) {
-                    console.error("Firestore Save Error:", err);
+                    console.error("Save Error:", err);
                 }
             }, 500);
         };
@@ -303,13 +302,16 @@
         window.delImg = (id) => { window.saveData(id, 'image', null); };
 
         const buildRow = (item, isAbril) => `
-            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 group">
                 ${isAbril ? `
                     <td class="p-5 border-r font-black text-coosajo-blue text-xs">${item.fecha}</td>
                     <td class="p-5 border-r text-slate-700 text-[10px] font-black uppercase leading-tight">${item.eje}</td>
-                ` : ``}
-                <td class="p-5 border-r text-slate-600 italic text-xs leading-relaxed">"${item.frase}"</td>
-                ${!isAbril ? `<td class="p-5 border-r text-slate-700 text-[10px] font-medium leading-tight">${item.copy}</td>` : ``}
+                    <td class="p-5 border-r text-slate-600 italic text-xs leading-relaxed">"${item.frase}"</td>
+                ` : `
+                    <td class="p-5 border-r text-slate-600 italic text-xs leading-relaxed">"${item.frase}"</td>
+                    <td class="p-5 border-r text-slate-700 text-[10px] font-medium leading-tight">${item.copy}</td>
+                `}
+                
                 <td class="p-5 border-r align-top">
                     <select id="st-${item.id}" onchange="window.saveData('${item.id}', 'status', this.value)"
                         class="w-full border border-slate-200 rounded-xl p-3 text-[10px] font-black uppercase focus:ring-2 focus:ring-coosajo-blue cursor-pointer bg-slate-50">
@@ -318,24 +320,27 @@
                         <option value="no_publicado">⚪ No publicado</option>
                     </select>
                 </td>
+
                 <td class="p-5 border-r align-top">
-                    <textarea id="pt-${item.id}" rows="2" placeholder="Pegar copy publicado..."
+                    <textarea id="pt-${item.id}" rows="2" placeholder="Pegar copy final..."
                         oninput="window.autoResize(this); window.saveData('${item.id}', 'post', this.value)"
                         class="w-full bg-slate-50 border border-slate-200 p-4 text-xs rounded-2xl focus:ring-2 focus:ring-coosajo-blue font-medium"></textarea>
                 </td>
+
                 <td class="p-5 border-r align-top">
-                    <textarea id="rs-${item.id}" rows="2" placeholder="Razón del cambio..."
+                    <textarea id="rs-${item.id}" rows="2" placeholder="Justificación del cambio..."
                         oninput="window.autoResize(this); window.saveData('${item.id}', 'reason', this.value)"
                         class="w-full bg-slate-50 border border-slate-200 p-4 text-xs rounded-2xl focus:ring-2 focus:ring-coosajo-green font-medium"></textarea>
                 </td>
+
                 <td class="p-5 align-top text-center">
-                    <label class="no-print cursor-pointer bg-coosajo-blue hover:bg-slate-800 text-white text-[10px] py-3 px-2 rounded-xl block mb-2 transition active:scale-95 font-black uppercase tracking-tighter">
+                    <label class="no-print cursor-pointer bg-coosajo-blue hover:bg-slate-800 text-white text-[10px] py-3 px-2 rounded-xl block mb-2 transition active:scale-95 font-black uppercase">
                         Subir Foto
                         <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
                     </label>
                     <div id="img-box-${item.id}" class="hidden">
                         <img id="img-${item.id}" src="" class="w-full max-h-32 object-contain border rounded-2xl mx-auto shadow-md bg-white">
-                        <button class="no-print text-[10px] text-red-500 hover:underline mt-3 font-black uppercase tracking-widest" onclick="window.delImg('${item.id}')">Eliminar</button>
+                        <button class="no-print text-[10px] text-red-500 hover:underline mt-3 font-black uppercase" onclick="window.delImg('${item.id}')">Eliminar</button>
                     </div>
                 </td>
             </tr>
@@ -350,7 +355,7 @@
             }
         }
 
-        // LOGIN SUBMIT
+        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const u = document.getElementById('username').value.trim();
@@ -359,23 +364,21 @@
             const btn = document.getElementById('btn-login');
             
             if (u !== 'sjemartinez' || p !== 'Coosajo2041') {
-                errorEl.innerText = "ACCESO DENEGADO: CREDENCIALES INVÁLIDAS";
+                errorEl.innerText = "CREDENCIALES INVÁLIDAS";
                 errorEl.classList.remove('hidden');
                 return;
             }
 
             errorEl.classList.add('hidden');
             btn.disabled = true;
-            btn.innerText = "AUTENTICANDO...";
+            btn.innerText = "CONECTANDO...";
 
             try {
-                // Autenticación anónima para habilitar acceso a Firestore
                 await signInAnonymously(auth);
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('app-view').classList.remove('hidden');
             } catch (err) {
-                console.error(err);
-                errorEl.innerText = "ERROR DE CONEXIÓN: VERIFIQUE SU CONFIGURACIÓN";
+                errorEl.innerText = "ERROR DE FIREBASE: " + err.code;
                 errorEl.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerText = "ACCEDER AL REPORTE";
@@ -390,7 +393,6 @@
             document.getElementById('section-marzo').style.display = (v === 'todos' || v === 'marzo') ? 'block' : 'none';
         });
 
-        // OBSERVADOR GLOBAL (Sincronizador)
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 initializeUI();
@@ -423,7 +425,7 @@
                         }
                     });
                 }, (err) => {
-                    console.error(err);
+                    console.error("Snapshot Error:", err);
                 });
             } else {
                 document.getElementById('login-view').classList.remove('hidden');
