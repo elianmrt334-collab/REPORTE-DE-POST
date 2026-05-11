@@ -49,15 +49,6 @@
         th { position: sticky; top: 0; z-index: 10; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Estilo para el botón de borrar */
-        .btn-delete-row {
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        tr:hover .btn-delete-row {
-            opacity: 1;
-        }
     </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800">
@@ -88,7 +79,7 @@
                     ACCEDER AL REPORTE
                 </button>
             </form>
-            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.2</p>
+            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.3</p>
         </div>
     </div>
 
@@ -111,7 +102,7 @@
                 <div class="no-print flex flex-wrap gap-3 items-center">
                     <div class="text-[10px] font-black border border-blue-400 bg-blue-900/40 px-4 py-2 rounded-xl flex items-center gap-2 uppercase tracking-tighter">
                         <span class="w-2 h-2 bg-green-400 rounded-full shadow-[0_0_8px_#4ade80]"></span>
-                        <span id="user-display">Sesión Activa</span>
+                        <span id="user-display-name">Sesión Activa</span>
                     </div>
                     
                     <div class="flex items-center bg-white rounded-xl shadow-sm px-3 py-2 border border-slate-200">
@@ -193,7 +184,7 @@
         </main>
     </div>
 
-    <!-- Modal Simple de Confirmación -->
+    <!-- Modal de Confirmación de Borrado -->
     <div id="delete-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full text-center">
             <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -202,10 +193,10 @@
                 </svg>
             </div>
             <h3 class="text-xl font-black text-slate-800 mb-2">¿Eliminar esta fila?</h3>
-            <p class="text-slate-500 text-sm mb-6">Esta acción ocultará la fila permanentemente del reporte.</p>
+            <p class="text-slate-500 text-sm mb-6">Esta acción ocultará la fila del reporte para todos los usuarios.</p>
             <div class="flex gap-3">
                 <button id="cancel-delete" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition">Cancelar</button>
-                <button id="confirm-delete" class="flex-1 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition shadow-lg shadow-red-200">Sí, eliminar</button>
+                <button id="confirm-delete" class="flex-1 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition">Eliminar</button>
             </div>
         </div>
     </div>
@@ -213,9 +204,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN FIREBASE ELIÁN
         const firebaseConfig = {
             apiKey: "AIzaSyACfn6C6_XqLDQI29f6uHUUwlCQkSCXNYk",
             authDomain: "costos-comunicacion-digital.firebaseapp.com",
@@ -235,8 +225,8 @@
         let unsubscribeSnapshot = null;
         let debounceTimers = {};
         let currentDeleteId = null;
+        let currentUser = null; // Para rastrear quién inició sesión
 
-        // Datos de ABRIL - Mantener tal cual estaban
         const abrilData = [
             { id: "A01", fecha: "7 abr", eje: "Becas", frase: "El cooperativismo convierte el esfuerzo colectivo en oportunidades reales." },
             { id: "A02", fecha: "8 abr", eje: "Finanzas", frase: "Un asociado informado es un asociado empoderado." },
@@ -264,7 +254,6 @@
             { id: "A24", fecha: "30 abr", eje: "Finanzas", frase: "Tener un presupuesto personal te da libertad real." }
         ];
 
-        // Datos de MARZO - Depurados (Removidas las 4 frases)
         const marzoData = [
             { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Acompañamos a mujeres en su crecimiento." },
             { id: "M02", frase: "Creer en el poder propio impulsa el negocio.", copy: "Formación y confianza para emprendedoras." },
@@ -297,7 +286,6 @@
             { id: "M32", frase: "Sembrar conocimiento es la base para cosechar mejores resultados.", copy: "Formación agrícola que impulsa sostenibilidad y productividad." }
         ];
 
-        // FUNCIONES CORE
         window.saveData = async (id, type, value) => {
             if (!auth.currentUser) return;
             clearTimeout(debounceTimers[`${id}_${type}`]);
@@ -339,7 +327,6 @@
 
         window.delImg = (id) => { window.saveData(id, 'image', null); };
 
-        // Función para borrar fila (Elián)
         window.askDeleteRow = (id) => {
             currentDeleteId = id;
             document.getElementById('delete-modal').classList.remove('hidden');
@@ -353,22 +340,20 @@
         document.getElementById('confirm-delete').addEventListener('click', async () => {
             if (!currentDeleteId) return;
             try {
-                // Marcamos como borrado en la base de datos
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'registros', currentDeleteId);
                 await setDoc(docRef, { deleted: true }, { merge: true });
-                
-                // Ocultamos localmente
                 const tr = document.querySelector(`tr[data-id="${currentDeleteId}"]`);
                 if (tr) tr.classList.add('hidden');
-                
                 document.getElementById('delete-modal').classList.add('hidden');
                 currentDeleteId = null;
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         });
 
-        const buildRow = (item, isAbril) => `
+        const buildRow = (item, isAbril) => {
+            // Verificamos si el usuario es Elián o el nuevo usuario para mostrar el botón
+            const canDelete = (currentUser === 'sjemartinez' || currentUser === 'sjjardon');
+            
+            return `
             <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 group" data-id="${item.id}">
                 ${isAbril ? `
                     <td class="p-5 border-r font-black text-coosajo-blue text-xs">${item.fecha}</td>
@@ -406,29 +391,30 @@
                             <button class="no-print text-[10px] text-red-500 font-black uppercase mt-2 hover:underline" onclick="window.delImg('${item.id}')">Eliminar Imagen</button>
                         </div>
 
-                        <!-- Botón de Borrar Fila - Solo para Elián -->
+                        ${canDelete ? `
                         <button onclick="window.askDeleteRow('${item.id}')" 
-                                class="btn-delete-row no-print mt-2 flex items-center justify-center gap-1 text-[9px] text-red-400 font-bold hover:text-red-600 uppercase transition">
+                                class="no-print mt-4 flex items-center justify-center gap-1 text-[9px] text-red-500 border border-red-200 bg-red-50 py-2 rounded-lg font-bold hover:bg-red-100 uppercase transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                             Borrar Fila
-                        </button>
+                        </button>` : ''}
                     </div>
                 </td>
             </tr>
-        `;
+        `;};
 
         function initializeUI() {
             const tbA = document.getElementById('abril-tbody');
             const tbM = document.getElementById('marzo-tbody');
-            if(tbA.innerHTML.trim() === "") {
-                abrilData.forEach(i => tbA.innerHTML += buildRow(i, true));
-                marzoData.forEach(i => tbM.innerHTML += buildRow(i, false));
-            }
+            // Limpiamos antes de reconstruir para asegurar que la lógica de usuario se aplique
+            tbA.innerHTML = "";
+            tbM.innerHTML = "";
+            abrilData.forEach(i => tbA.innerHTML += buildRow(i, true));
+            marzoData.forEach(i => tbM.innerHTML += buildRow(i, false));
         }
 
-        // LOGIN SUBMIT (Actualizado con sjjardon)
+        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const u = document.getElementById('username').value.trim();
@@ -437,17 +423,21 @@
             const btn = document.getElementById('btn-login');
             
             const validUsers = ['sjemartinez', 'sjjardon'];
-            
             if (!validUsers.includes(u) || p !== 'Coosajo2041') {
                 errorEl.innerText = "USUARIO O CONTRASEÑA INCORRECTOS"; errorEl.classList.remove('hidden'); return;
             }
+            
             errorEl.classList.add('hidden'); btn.disabled = true; btn.innerText = "AUTENTICANDO...";
+            
             try {
                 await signInAnonymously(auth);
+                currentUser = u; // Guardamos el usuario para la UI
+                document.getElementById('user-display-name').innerText = "Sesión: " + u;
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('app-view').classList.remove('hidden');
+                initializeUI(); // Construimos la tabla con el permiso de borrado si aplica
             } catch (err) {
-                errorEl.innerText = "ERROR DE CONEXIÓN"; errorEl.classList.remove('hidden');
+                errorEl.innerText = "ERROR DE SERVIDOR"; errorEl.classList.remove('hidden');
                 btn.disabled = false; btn.innerText = "ACCEDER AL REPORTE";
             }
         });
@@ -462,21 +452,17 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                initializeUI();
                 const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'registros');
                 unsubscribeSnapshot = onSnapshot(postsRef, (snapshot) => {
                     document.getElementById('loading-indicator').classList.add('hidden');
                     document.getElementById('tables-container').classList.remove('hidden');
                     snapshot.docChanges().forEach((change) => {
                         const data = change.doc.data(); const id = change.doc.id;
-                        
-                        // Si está marcada como borrada, ocultar
                         if (data.deleted === true) {
                             const tr = document.querySelector(`tr[data-id="${id}"]`);
                             if (tr) tr.classList.add('hidden');
                             return;
                         }
-
                         const st = document.getElementById(`st-${id}`);
                         if (st && st.value !== data.status) st.value = data.status || 'publicado_igual';
                         const rs = document.getElementById(`rs-${id}`);
