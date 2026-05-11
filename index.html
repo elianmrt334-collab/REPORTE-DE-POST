@@ -79,7 +79,7 @@
                     ACCEDER AL REPORTE
                 </button>
             </form>
-            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.0</p>
+            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.1</p>
         </div>
     </div>
 
@@ -237,9 +237,9 @@
             { id: "A24", fecha: "30 abr", eje: "Finanzas", frase: "Tener un presupuesto personal te da libertad real." }
         ];
 
-        // Datos de MARZO - Basado en resaltados y capturas del usuario
+        // Datos de MARZO - Listado actualizado removiendo las 4 frases solicitadas
         const marzoData = [
-            // Registros de las capturas (M01-M12)
+            // Registros de las capturas (M01-M12) - SE MANTIENEN IDÉNTICOS
             { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Acompañamos a mujeres en su crecimiento." },
             { id: "M02", frase: "Creer en el poder propio impulsa el negocio.", copy: "Formación y confianza para emprendedoras." },
             { id: "M03", frase: "Emprender es florecer por dentro.", copy: "Academia para construir negocios con identidad." },
@@ -252,27 +252,24 @@
             { id: "M10", frase: "Un emprendedor con dirección llega lejos.", copy: "Acompañamos tus pasos con propósito real." },
             { id: "M11", frase: "Cada emprendimiento tiene un camino.", copy: "Orientación para fortalecer tu marca desde la esencia." },
             { id: "M12", frase: "Herramientas digitales abren nuevas puertas.", copy: "RED: Conectando con conocimiento que impulsa." },
-            // Seleccionados del documento resaltados (Verde/Amarillo)
+            // Registros restantes depurados
             { id: "M13", frase: "Dominar herramientas digitales es abrir nuevas puertas para tu emprendimiento.", copy: "RED te conecta con conocimiento actual que impulsa tu marca en el mundo digital." },
             { id: "M14", frase: "Un emprendedor digital está preparado para los desafíos del futuro.", copy: "Te acompañamos para que tu negocio aproveche todo el potencial de la era digital." },
             { id: "M15", frase: "El mundo avanza rápido, y tu negocio puede avanzar con él.", copy: "En RED aprendemos herramientas tecnológicas que ayudan a emprender mejor." },
-            { id: "M16", frase: "Lo digital no es el futuro, es el presente, y tu emprendimiento merece estar ahí.", copy: "Te brindamos formación práctica para crecer de manera moderna y eficiente." },
-            { id: "M17", frase: "Una marca con presencia digital tiene más oportunidades de crecer.", copy: "RED impulsa a emprendedores a fortalecer su comunicación y proyección online." },
-            { id: "M18", frase: "Tus habilidades digitales pueden llevar tu emprendimiento más lejos.", copy: "Descubre nuevas formas de emprender a través de herramientas tecnológicas." },
-            { id: "M19", frase: "Cuando un joven descubre su capacidad de crear, todo su futuro cambia.", copy: "ACCESO JOVEN despierta el interés de emprender e innovar." },
-            { id: "M20", frase: "La innovación nace en una mente joven que se atreve a imaginar nuevas soluciones.", copy: "Impulsamos habilidades para que los jóvenes transformen ideas en proyectos reales." },
-            { id: "M21", frase: "Emprender comienza con un sueño y una mente lista para aprender.", copy: "Acompañamos a jóvenes en el inicio de su camino emprendedor." },
-            { id: "M22", frase: "Cada joven tiene un potencial enorme; solo necesita descubrirlo.", copy: "ACCESO JOVEN fomenta liderazgo, creatividad y visión de futuro." },
-            { id: "M23", frase: "Cuando los jóvenes se atreven a innovar, las comunidades avanzan.", copy: "Formamos una generación con ganas de emprender y cambiar su entorno." },
-            { id: "M24", frase: "Un oficio aprendido es una oportunidad para toda la vida.", copy: "Formación técnica que fortalece tu futuro laboral." },
-            { id: "M25", frase: "Un curso técnico puede ser el inicio de una nueva historia profesional.", copy: "Capacitación especializada para crecer en el mundo laboral." },
-            { id: "M26", frase: "Tu talento se potencia cuando desarrollas nuevas habilidades.", copy: "Nuestros cursos técnicos están diseñados para impulsar tu capacidad." },
-            { id: "M27", frase: "Aprender un oficio es invertir en un futuro más seguro.", copy: "Te ofrecemos herramientas para mejorar tus oportunidades." },
-            { id: "M28", frase: "La excelencia académica transforma vidas y abre puertas que parecían imposibles.", copy: "Acompañamos a estudiantes que destacan por su esfuerzo y dedicación." },
-            { id: "M29", frase: "El talento necesita oportunidades, y las oportunidades crean movilidad social.", copy: "Becas Excelencia impulsa a jóvenes que creen en el poder de estudiar." },
-            { id: "M30", frase: "Los niños que aprenden a cooperar crecen siendo mejores ciudadanos.", copy: "Wachalal impulsa valores que unen y transforman." },
-            { id: "M31", frase: "Sembrar conocimiento es la base para cosechar mejores resultados.", copy: "Formación agrícola que impulsa sostenibilidad y productividad." },
-            { id: "M32", frase: "Cada cultivo cuenta una historia de esfuerzo, disciplina y aprendizaje.", copy: "Apoyamos a agricultores para mejorar su producción." }
+            { id: "M16", frase: "Una marca con presencia digital tiene más oportunidades de crecer.", copy: "RED impulsa a emprendedores a fortalecer su comunicación y proyección online." },
+            { id: "M17", frase: "Tus habilidades digitales pueden llevar tu emprendimiento más lejos.", copy: "Descubre nuevas formas de emprender a través de herramientas tecnológicas." },
+            { id: "M18", frase: "Cuando un joven descubre su capacidad de crear, todo su futuro cambia.", copy: "ACCESO JOVEN despierta el interés de emprender e innovar." },
+            { id: "M19", frase: "La innovación nace en una mente joven que se atreve a imaginar nuevas soluciones.", copy: "Impulsamos habilidades para que los jóvenes transformen ideas en proyectos reales." },
+            { id: "M21", frase: "Un oficio aprendido es una oportunidad para toda la vida.", copy: "Formación técnica que fortalece tu futuro laboral." },
+            { id: "M23", frase: "Aprender un oficio es invertir en un futuro más seguro.", copy: "Te ofrecemos herramientas para mejorar tus oportunidades." },
+            { id: "M25", frase: "El conocimiento es una herramienta poderosa que te abre camino.", copy: "Con becas Excelencia impulsamos estudiantes con sueños, metas y determinación." },
+            { id: "M26", frase: "Cuando enseñamos valores desde pequeños, sembramos adultos responsables.", copy: "Wachalal forma niños y jóvenes con visión financiera y cooperativa." },
+            { id: "M27", frase: "Los niños que aprenden a cooperar crecen siendo mejores ciudadanos.", copy: "Wachalal impulsa valores que unen y transforman." },
+            { id: "M28", frase: "La educación financiera te permite caminar con más seguridad hacia tus metas.", copy: "Te acompañamos a administrar mejor tus recursos." },
+            { id: "M29", frase: "Organizar tus finanzas es un acto de amor hacia tu futuro.", copy: "HUELLAS ofrece herramientas para una vida más estable." },
+            { id: "M30", frase: "Las habilidades blandas construyen relaciones, oportunidades y crecimiento personal.", copy: "Formación para fortalecer tu comunicación, liderazgo y confianza." },
+            { id: "M31", frase: "La organización comunitaria es la base del desarrollo sostenible.", copy: "Impulsamos la unión, la participación y el liderazgo." },
+            { id: "M32", frase: "Sembrar conocimiento es la base para cosechar mejores resultados.", copy: "Formación agrícola que impulsa sostenibilidad y productividad." }
         ];
 
         // FUNCIONES CORE
@@ -365,7 +362,7 @@
             }
         }
 
-        // LOGIN
+        // LOGIN SUBMIT
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const u = document.getElementById('username').value.trim();
