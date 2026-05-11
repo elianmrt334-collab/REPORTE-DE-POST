@@ -41,153 +41,148 @@
                 width: 100%;
                 font-family: inherit;
             }
-            select {
-                appearance: none;
-                border: none !important;
-                background: transparent !important;
-                font-weight: bold;
-                color: black !important;
-                padding: 0 !important;
-            }
             img { page-break-inside: avoid; max-height: 120px !important; }
-            .bg-coosajo-light { background-color: transparent !important; }
         }
         
         textarea { transition: border-color 0.2s; overflow: hidden; }
         .table-container { overflow-x: auto; }
         th { position: sticky; top: 0; z-index: 10; }
-
-        /* Animación suave para cambio de pantalla */
-        .fade-in { animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="bg-slate-100 font-sans text-slate-800">
 
     <!-- Pantalla de Login -->
-    <div id="login-view" class="fixed inset-0 bg-coosajo-blue flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
+    <div id="login-view" class="fixed inset-0 bg-coosajo-blue flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transition-all duration-300">
             <div class="text-center mb-8">
-                <!-- Logo con nombre exacto solicitado y respaldo visual mejorado -->
-                <div class="h-24 flex items-center justify-center mb-4 overflow-hidden rounded-lg">
+                <!-- Logo con nombre exacto y fallback inteligente -->
+                <div class="h-20 flex items-center justify-center mb-6">
                     <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo Coosajo" class="max-h-full object-contain" 
-                         onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
-                    <div id="logo-fallback" class="hidden w-full h-full bg-slate-50 items-center justify-center border-2 border-dashed border-slate-200">
-                        <span class="text-coosajo-blue font-black text-3xl tracking-tighter italic">COOSAJO</span>
-                    </div>
+                         onerror="this.style.display='none'; document.getElementById('logo-text-fallback').style.display='block';">
+                    <div id="logo-text-fallback" class="hidden font-black text-4xl text-coosajo-blue tracking-tighter italic">COOSAJO</div>
                 </div>
-                <h2 class="text-2xl font-extrabold text-gray-800">Acceso al Reporte</h2>
-                <p class="text-sm text-gray-500 mt-1">Vinculación Social</p>
+                <h2 class="text-2xl font-black text-slate-800">Reporte Digital</h2>
+                <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-widest">Vinculación Social</p>
             </div>
-            <form id="login-form" class="space-y-6">
+            <form id="login-form" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Usuario</label>
-                    <input type="text" id="username" value="sjemartinez" class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all" placeholder="Usuario">
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase ml-1">Usuario</label>
+                    <input type="text" id="username" value="sjemartinez" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all font-medium">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
-                    <input type="password" id="password" value="Coosajo2041" class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all" placeholder="••••••••">
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase ml-1">Contraseña</label>
+                    <input type="password" id="password" value="Coosajo2041" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all font-medium">
                 </div>
-                <div id="login-error" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 font-medium"></div>
-                <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
-                    <span id="btn-text">Ingresar al Reporte</span>
+                <div id="login-error" class="hidden text-[11px] text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 font-bold text-center"></div>
+                <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-black py-4 px-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
+                    ACCEDER AHORA
                 </button>
             </form>
-            <p class="text-[10px] text-center text-gray-400 mt-6 font-mono tracking-widest uppercase">Sistema de Sincronización v2.2</p>
+            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Seguridad Integrada v3.0</p>
         </div>
     </div>
 
     <!-- Aplicación Principal -->
     <div id="app-view" class="hidden min-h-screen flex flex-col fade-in">
-        <header class="bg-coosajo-blue text-white shadow-md print:shadow-none print:bg-transparent print:text-black">
-            <div class="max-w-[1400px] mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
-                <div class="flex items-center mb-4 md:mb-0">
-                    <div class="bg-white p-1.5 rounded-lg shadow-sm flex items-center justify-center">
-                        <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo" class="h-10 w-auto"
+        <header class="bg-coosajo-blue text-white shadow-lg print:shadow-none print:bg-white print:text-black">
+            <div class="max-w-[1500px] mx-auto px-4 py-4 w-full flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center">
+                    <div class="bg-white p-2 rounded-xl shadow-inner flex items-center justify-center h-12 w-32 overflow-hidden">
+                        <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo" class="max-h-full"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <span class="hidden text-coosajo-blue font-bold text-sm px-2">COOSAJO</span>
+                        <span class="hidden text-coosajo-blue font-black text-lg italic">COOSAJO</span>
                     </div>
-                    <div class="ml-4">
-                        <h1 class="text-xl font-bold leading-tight">Reporte de Publicaciones</h1>
-                        <p class="text-coosajo-green font-semibold text-xs print:text-gray-600 uppercase tracking-widest">Vinculación Social</p>
+                    <div class="ml-5">
+                        <h1 class="text-xl font-black leading-tight tracking-tight">Reporte de Publicaciones</h1>
+                        <p class="text-coosajo-green font-bold text-[10px] uppercase tracking-[0.2em] print:text-slate-500">Vinculación Social</p>
                     </div>
                 </div>
+                
                 <div class="no-print flex flex-wrap gap-3 items-center">
-                    <div class="text-[11px] font-bold border border-blue-400 bg-blue-800/30 px-3 py-2 rounded-lg flex items-center gap-2 uppercase">
-                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        <span id="user-display">sjemartinez</span>
+                    <div class="text-[10px] font-black border border-blue-400 bg-blue-900/40 px-4 py-2 rounded-xl flex items-center gap-2 uppercase tracking-tighter">
+                        <span class="w-2 h-2 bg-green-400 rounded-full shadow-[0_0_8px_#4ade80]"></span>
+                        <span id="user-display">Sesión: sjemartinez</span>
                     </div>
                     
-                    <div class="flex items-center bg-white rounded-lg shadow-sm px-3 py-1.5 border border-slate-200">
-                        <label for="monthFilter" class="text-xs font-black text-coosajo-blue mr-2 uppercase">Mes:</label>
-                        <select id="monthFilter" class="text-xs text-gray-700 focus:outline-none cursor-pointer bg-transparent font-bold uppercase">
-                            <option value="todos">Todos</option>
-                            <option value="abril">Abril</option>
-                            <option value="marzo">Marzo</option>
+                    <div class="flex items-center bg-white rounded-xl shadow-sm px-3 py-2 border border-slate-200">
+                        <label for="monthFilter" class="text-[10px] font-black text-coosajo-blue mr-2 uppercase">Filtrar:</label>
+                        <select id="monthFilter" class="text-[11px] text-slate-700 focus:outline-none cursor-pointer bg-transparent font-bold uppercase">
+                            <option value="todos">Todo el Trimestre</option>
+                            <option value="abril">Mes: Abril</option>
+                            <option value="marzo">Mes: Marzo</option>
                         </select>
                     </div>
                     
-                    <button id="btn-export" class="bg-coosajo-green hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition text-xs font-bold active:scale-95">
-                        PDF
+                    <button id="btn-export" class="bg-white text-coosajo-blue hover:bg-slate-100 px-5 py-2 rounded-xl shadow-md transition-all text-xs font-black active:scale-95 uppercase">
+                        Generar PDF
                     </button>
-                    <button id="btn-logout" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg shadow transition text-xs font-bold active:scale-95">
-                        Salir
+                    <button id="btn-logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow-md transition-all text-xs font-black active:scale-95 uppercase">
+                        Cerrar
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-[1400px] mx-auto px-4 py-8 sm:px-6 lg:px-8 flex-1 w-full">
-            <div id="loading-indicator" class="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-gray-200 shadow-inner">
-                <div class="inline-block animate-spin rounded-full h-14 w-14 border-b-4 border-coosajo-green"></div>
-                <p class="mt-6 text-coosajo-blue font-black text-xl tracking-tight">Estableciendo conexión...</p>
-                <p class="text-gray-400 text-sm mt-2">Sincronizando datos de Marzo y Abril</p>
+        <main class="max-w-[1500px] mx-auto px-4 py-8 w-full flex-1">
+            <!-- Cargando Mejorado -->
+            <div id="loading-indicator" class="text-center py-32 bg-white rounded-[2rem] border-2 border-dashed border-slate-200 shadow-xl">
+                <div class="relative inline-block">
+                    <div class="h-16 w-16 rounded-full border-4 border-slate-100 border-t-coosajo-green animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="h-8 w-8 bg-coosajo-blue rounded-lg animate-pulse"></div>
+                    </div>
+                </div>
+                <p class="mt-8 text-coosajo-blue font-black text-2xl tracking-tighter">Sincronizando Base de Datos...</p>
+                <p class="text-slate-400 text-sm mt-2 font-medium">Buscando registros en la nube de Vinculación Social</p>
+                <div id="error-db-msg" class="hidden mt-6 text-red-500 font-bold bg-red-50 p-4 rounded-xl max-w-sm mx-auto border border-red-100"></div>
             </div>
 
             <div id="tables-container" class="hidden space-y-16">
                 <!-- ABRIL -->
-                <section id="section-abril">
-                    <div class="flex items-center gap-4 mb-6">
-                        <h2 class="text-2xl font-black text-coosajo-blue uppercase tracking-tighter">Reporte Abril</h2>
-                        <div class="flex-1 h-1 bg-coosajo-green rounded-full opacity-30"></div>
+                <section id="section-abril" class="fade-in">
+                    <div class="flex items-center gap-6 mb-8">
+                        <h2 class="text-3xl font-black text-coosajo-blue uppercase tracking-tighter">Mes de Abril</h2>
+                        <div class="flex-1 h-1.5 bg-gradient-to-r from-coosajo-green to-transparent rounded-full opacity-30"></div>
                     </div>
-                    <div class="bg-white shadow-2xl rounded-2xl border border-gray-200 table-container overflow-hidden">
+                    <div class="bg-white shadow-2xl rounded-3xl border border-slate-200 table-container overflow-hidden">
                         <table class="min-w-full text-left text-sm">
-                            <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-widest">
+                            <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-[0.15em] font-black">
                                 <tr>
-                                    <th class="p-4 w-24">Fecha</th>
-                                    <th class="p-4 w-32">Eje</th>
-                                    <th class="p-4 w-48">Frase Original</th>
-                                    <th class="p-4 w-40">Estado</th>
-                                    <th class="p-4 min-w-[200px]">Post Publicado</th>
-                                    <th class="p-4 min-w-[200px]">Observaciones</th>
-                                    <th class="p-4 w-40">Evidencia</th>
+                                    <th class="p-5 w-28">Fecha</th>
+                                    <th class="p-5 w-36">Eje Social</th>
+                                    <th class="p-5 w-56">Frase Propuesta</th>
+                                    <th class="p-5 w-44">Estado</th>
+                                    <th class="p-5 min-w-[250px]">Copy Final Publicado</th>
+                                    <th class="p-5 min-w-[200px]">Justificación</th>
+                                    <th class="p-5 w-44">Evidencia</th>
                                 </tr>
                             </thead>
-                            <tbody id="abril-tbody" class="divide-y divide-gray-100"></tbody>
+                            <tbody id="abril-tbody" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </section>
 
                 <!-- MARZO -->
-                <section id="section-marzo">
-                    <div class="flex items-center gap-4 mb-6">
-                        <h2 class="text-2xl font-black text-coosajo-blue uppercase tracking-tighter">Reporte Marzo</h2>
-                        <div class="flex-1 h-1 bg-coosajo-green rounded-full opacity-30"></div>
+                <section id="section-marzo" class="fade-in">
+                    <div class="flex items-center gap-6 mb-8">
+                        <h2 class="text-3xl font-black text-coosajo-blue uppercase tracking-tighter">Mes de Marzo</h2>
+                        <div class="flex-1 h-1.5 bg-gradient-to-r from-coosajo-green to-transparent rounded-full opacity-30"></div>
                     </div>
-                    <div class="bg-white shadow-2xl rounded-2xl border border-gray-200 table-container overflow-hidden">
+                    <div class="bg-white shadow-2xl rounded-3xl border border-slate-200 table-container overflow-hidden">
                         <table class="min-w-full text-left text-sm">
-                            <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-widest">
+                            <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-[0.15em] font-black">
                                 <tr>
-                                    <th class="p-4 w-48">Frase Original</th>
-                                    <th class="p-4 w-48">Copy Sugerido</th>
-                                    <th class="p-4 w-40">Estado</th>
-                                    <th class="p-4 min-w-[200px]">Post Publicado</th>
-                                    <th class="p-4 min-w-[200px]">Observaciones</th>
-                                    <th class="p-4 w-40">Evidencia</th>
+                                    <th class="p-5 w-56">Frase Original</th>
+                                    <th class="p-5 w-56">Copy de Referencia</th>
+                                    <th class="p-5 w-44">Estado</th>
+                                    <th class="p-5 min-w-[250px]">Copy Final Publicado</th>
+                                    <th class="p-5 min-w-[200px]">Justificación</th>
+                                    <th class="p-5 w-44">Evidencia</th>
                                 </tr>
                             </thead>
-                            <tbody id="marzo-tbody" class="divide-y divide-gray-100"></tbody>
+                            <tbody id="marzo-tbody" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </section>
@@ -200,7 +195,7 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN DE FIREBASE OBLIGATORIA
+        // CONFIGURACIÓN DINÁMICA
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const app = initializeApp(firebaseConfig);
@@ -210,7 +205,7 @@
         let unsubscribeSnapshot = null;
         let debounceTimers = {};
 
-        // Datos del Reporte (Estructura estática)
+        // Datos del Reporte
         const abrilData = [
             { id: "A01", fecha: "7 abr", eje: "Becas", frase: "El cooperativismo convierte el esfuerzo colectivo en oportunidades reales." },
             { id: "A02", fecha: "8 abr", eje: "Finanzas", frase: "Un asociado informado es un asociado empoderado." },
@@ -222,48 +217,48 @@
             { id: "A08", fecha: "14 abr", eje: "Finanzas", frase: "Promovemos el crédito responsable." },
             { id: "A09", fecha: "15 abr", eje: "Ambiente", frase: "Cuidar la naturaleza es un acto cooperativo." },
             { id: "A10", fecha: "16 abr", eje: "Empresa", frase: "Emprender juntos nos hace más fuertes." },
-            { id: "A11", fecha: "17 abr", eje: "Becas", frase: "Programas que nacen de la solidaridad." },
-            { id: "A12", fecha: "18 abr", eje: "Técnica", frase: "La formación técnica fortalece capacidades." },
-            { id: "A13", fecha: "19 abr", eje: "Finanzas", frase: "La educación financiera habla de valores." },
+            { id: "A11", fecha: "17 abr", eje: "Becas", frase: "Programas sociales nacen de la solidaridad." },
+            { id: "A12", fecha: "18 abr", eje: "Técnica", frase: "La formación técnica fortalece capacidades locales." },
+            { id: "A13", fecha: "19 abr", eje: "Finanzas", frase: "La educación financiera cooperativa habla de valores." },
             { id: "A14", fecha: "20 abr", eje: "Ambiente", frase: "Cooperar también es proteger la vida." },
-            { id: "A15", fecha: "21 abr", eje: "Juventud", frase: "Empoderamos a la juventud para liderar con valores." },
+            { id: "A15", fecha: "21 abr", eje: "Juventud", frase: "Empoderamos a la juventud para liderar el cambio." },
             { id: "A16", fecha: "22 abr", eje: "Mujeres", frase: "Cuando las mujeres crecen, la comunidad progresa." },
             { id: "A17", fecha: "23 abr", eje: "Becas", frase: "Invertimos en educación porque creemos en las personas." },
-            { id: "A18", fecha: "24 abr", eje: "Técnica", frase: "Construir juntos a través del aprendizaje." },
-            { id: "A19", fecha: "25 abr", eje: "Finanzas", frase: "El ahorro cooperativo construye futuro." },
-            { id: "A20", fecha: "26 abr", eje: "Juventud", frase: "Talento joven para desarrollo comunitario." },
-            { id: "A21", fecha: "27 abr", eje: "Ambiente", frase: "El compromiso ambiental es de todos." },
-            { id: "A22", fecha: "28 abr", eje: "Becas", frase: "Cuando alguien estudia, la comunidad avanza." },
+            { id: "A18", fecha: "24 abr", eje: "Técnica", frase: "Desde el cooperativismo se enseña a construir juntos." },
+            { id: "A19", fecha: "25 abr", eje: "Finanzas", frase: "El ahorro cooperativo construye futuro familiar." },
+            { id: "A20", fecha: "26 abr", eje: "Juventud", frase: "Talento joven convertido en desarrollo comunitario." },
+            { id: "A21", fecha: "27 abr", eje: "Ambiente", frase: "El cuidado del medio ambiente es compromiso de todos." },
+            { id: "A22", fecha: "28 abr", eje: "Becas", frase: "Cuando alguien estudia, toda la comunidad avanza." },
             { id: "A23", fecha: "29 abr", eje: "Empresa", frase: "Propósitos compartidos transforman comunidades." },
-            { id: "A24", fecha: "30 abr", eje: "Finanzas", frase: "Un presupuesto personal te da libertad." }
+            { id: "A24", fecha: "30 abr", eje: "Finanzas", frase: "Tener un presupuesto personal te da libertad real." }
         ];
 
         const marzoData = [
-            { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Acompañamos mujeres que desean crecer." },
+            { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Acompañamos a mujeres en su crecimiento." },
             { id: "M02", frase: "Creer en el poder propio impulsa el negocio.", copy: "Formación y confianza para emprendedoras." },
-            { id: "M03", frase: "El primer paso es florecer por dentro.", copy: "Academia para construir negocios con identidad." },
-            { id: "M04", frase: "Cada mujer es una semilla llena de posibilidades.", copy: "Acompañamiento para el máximo potencial." },
-            { id: "M05", frase: "Empoderarse es florecer raíces.", copy: "Bases firmes para negocios de mujeres." },
+            { id: "M03", frase: "Emprender es florecer por dentro.", copy: "Academia para construir negocios con identidad." },
+            { id: "M04", frase: "Cada mujer es una semilla llena de posibilidades.", copy: "Acompañamiento para alcanzar el máximo potencial." },
+            { id: "M05", frase: "Empoderarse es florecer raíces hacia el futuro.", copy: "Bases firmes para negocios de mujeres." },
             { id: "M06", frase: "Cuando ella florece, la comunidad también.", copy: "Transformando realidades desde el crecimiento femenino." },
-            { id: "M07", frase: "Dirección clara convierte sueños en proyectos.", copy: "BRÚJULA: Estrategia y rumbo definido." },
-            { id: "M08", frase: "Tu idea ya tiene valor, necesita dirección.", copy: "Guía paso a paso para avanzar con seguridad." },
-            { id: "M09", frase: "Todo emprendedor necesita una brújula.", copy: "Trabajamos para fortalecer tu negocio." },
-            { id: "M10", frase: "Negocios sólidos nacen de decisiones guiadas.", copy: "Claridad y acompañamiento estratégico." },
-            { id: "M11", frase: "Un emprendedor con dirección llega lejos.", copy: "Acompañando tus pasos con propósito." },
-            { id: "M12", frase: "Cada emprendimiento tiene un camino.", copy: "Orientación para fortalecer tu esencia." },
-            { id: "M13", frase: "Herramientas digitales abren nuevas puertas.", copy: "RED: Conectando con conocimiento actual." }
+            { id: "M07", frase: "Dirección clara convierte sueños en proyectos.", copy: "BRÚJULA: Estrategia y rumbo definido para emprender." },
+            { id: "M08", frase: "Tu idea ya tiene valor, necesita dirección.", copy: "Te guiamos paso a paso para avanzar con seguridad." },
+            { id: "M09", frase: "Todo emprendedor necesita una brújula.", copy: "Fortalecemos tu negocio con visión estratégica." },
+            { id: "M10", frase: "Negocios sólidos nacen de decisiones guiadas.", copy: "Claridad y acompañamiento para el éxito local." },
+            { id: "M11", frase: "Un emprendedor con dirección llega lejos.", copy: "Acompañamos tus pasos con propósito real." },
+            { id: "M12", frase: "Cada emprendimiento tiene un camino.", copy: "Orientación para fortalecer tu marca desde la esencia." },
+            { id: "M13", frase: "Herramientas digitales abren nuevas puertas.", copy: "RED: Conectando con conocimiento que impulsa." }
         ];
 
-        // FUNCIONES DE SINCRONIZACIÓN (Regla 1 y 2)
+        // FUNCIONES GLOBALES
         window.saveData = async (id, type, value) => {
             clearTimeout(debounceTimers[`${id}_${type}`]);
             debounceTimers[`${id}_${type}`] = setTimeout(async () => {
                 try {
-                    // RUTA ESTRICTA OBLIGATORIA
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'coosajo_report_final', id);
+                    // REGLA 1: Ruta estricta obligatoria v3
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'coosajo_v3', id);
                     await setDoc(docRef, { [type]: value }, { merge: true });
                 } catch (err) {
-                    console.error("Firebase Sync Error:", err);
+                    console.error("Firestore Save Error:", err);
                 }
             }, 500);
         };
@@ -282,7 +277,7 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 450;
+                    const MAX_WIDTH = 400; 
                     let width = img.width;
                     let height = img.height;
                     if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
@@ -291,8 +286,10 @@
                     ctx.drawImage(img, 0, 0, width, height);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.4); 
                     window.saveData(id, 'image', dataUrl);
-                    document.getElementById(`img-${id}`).src = dataUrl;
-                    document.getElementById(`img-box-${id}`).classList.remove('hidden');
+                    const imgEl = document.getElementById(`img-${id}`);
+                    const boxEl = document.getElementById(`img-box-${id}`);
+                    if(imgEl) imgEl.src = dataUrl;
+                    if(boxEl) boxEl.classList.remove('hidden');
                 }
                 img.src = e.target.result;
             }
@@ -305,91 +302,92 @@
             document.getElementById(`img-box-${id}`).classList.add('hidden');
         };
 
-        // UI BUILDER
+        // UI ROW BUILDER
         const buildRow = (item, isAbril) => `
-            <tr class="hover:bg-blue-50 transition-colors border-b border-gray-100 group">
+            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 group">
                 ${isAbril ? `
-                    <td class="p-4 border-r font-black text-coosajo-blue text-xs">${item.fecha}</td>
-                    <td class="p-4 border-r text-gray-700 text-[10px] font-bold uppercase tracking-tighter">${item.eje}</td>
+                    <td class="p-5 border-r font-black text-coosajo-blue text-xs">${item.fecha}</td>
+                    <td class="p-5 border-r text-slate-700 text-[10px] font-black uppercase leading-tight">${item.eje}</td>
                 ` : ``}
-                <td class="p-4 border-r text-gray-600 italic text-xs leading-relaxed">"${item.frase}"</td>
-                ${!isAbril ? `<td class="p-4 border-r text-gray-700 text-[10px] font-medium italic">${item.copy}</td>` : ``}
-                <td class="p-4 border-r align-top">
+                <td class="p-5 border-r text-slate-600 italic text-xs leading-relaxed">"${item.frase}"</td>
+                ${!isAbril ? `<td class="p-5 border-r text-slate-700 text-[10px] font-medium leading-tight">${item.copy}</td>` : ``}
+                <td class="p-5 border-r align-top">
                     <select id="st-${item.id}" onchange="window.saveData('${item.id}', 'status', this.value)"
-                        class="w-full border rounded-lg p-2 text-[10px] font-black uppercase focus:ring-1 focus:ring-coosajo-blue cursor-pointer">
+                        class="w-full border border-slate-200 rounded-xl p-3 text-[10px] font-black uppercase focus:ring-2 focus:ring-coosajo-blue cursor-pointer bg-slate-50">
                         <option value="publicado_igual">🔵 Publicado Igual</option>
                         <option value="modificado">🟢 Modificado</option>
                         <option value="no_publicado">⚪ No publicado</option>
                     </select>
                 </td>
-                <td class="p-4 border-r align-top">
-                    <textarea id="pt-${item.id}" rows="2" placeholder="Copy final..."
+                <td class="p-5 border-r align-top">
+                    <textarea id="pt-${item.id}" rows="2" placeholder="Pegar copy publicado..."
                         oninput="window.autoResize(this); window.saveData('${item.id}', 'post', this.value)"
-                        class="w-full bg-coosajo-light border p-3 text-xs rounded-xl focus:ring-1 focus:ring-coosajo-blue"></textarea>
+                        class="w-full bg-slate-50 border border-slate-200 p-4 text-xs rounded-2xl focus:ring-2 focus:ring-coosajo-blue font-medium"></textarea>
                 </td>
-                <td class="p-4 border-r align-top">
-                    <textarea id="rs-${item.id}" rows="2" placeholder="¿Por qué el cambio?..."
+                <td class="p-5 border-r align-top">
+                    <textarea id="rs-${item.id}" rows="2" placeholder="Razón del cambio..."
                         oninput="window.autoResize(this); window.saveData('${item.id}', 'reason', this.value)"
-                        class="w-full border p-3 text-xs rounded-xl focus:ring-1 focus:ring-coosajo-green"></textarea>
+                        class="w-full bg-slate-50 border border-slate-200 p-4 text-xs rounded-2xl focus:ring-2 focus:ring-coosajo-green font-medium"></textarea>
                 </td>
-                <td class="p-4 align-top text-center">
-                    <label class="no-print cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] py-2 px-1 rounded-xl border block mb-2 transition active:scale-95 font-black uppercase">
-                        Subir Evidencia
+                <td class="p-5 align-top text-center">
+                    <label class="no-print cursor-pointer bg-coosajo-blue hover:bg-slate-800 text-white text-[10px] py-3 px-2 rounded-xl block mb-2 transition active:scale-95 font-black uppercase tracking-tighter">
+                        Subir Foto
                         <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
                     </label>
                     <div id="img-box-${item.id}" class="hidden">
-                        <img id="img-${item.id}" src="" class="w-full max-h-28 object-contain border rounded-xl mx-auto shadow-md">
-                        <button class="no-print text-[10px] text-red-500 hover:underline mt-2 font-black uppercase" onclick="window.delImg('${item.id}')">Eliminar</button>
+                        <img id="img-${item.id}" src="" class="w-full max-h-32 object-contain border rounded-2xl mx-auto shadow-md bg-white">
+                        <button class="no-print text-[10px] text-red-500 hover:underline mt-3 font-black uppercase tracking-widest" onclick="window.delImg('${item.id}')">Eliminar</button>
                     </div>
                 </td>
             </tr>
         `;
 
-        // MANEJO DE VISTAS
-        function switchView(toApp) {
-            const loginView = document.getElementById('login-view');
-            const appView = document.getElementById('app-view');
-            if (toApp) {
-                loginView.classList.add('hidden');
-                appView.classList.remove('hidden');
-            } else {
-                loginView.classList.remove('hidden');
-                appView.classList.add('hidden');
+        // MANEJO DE VISTAS (Forzado)
+        function showApp() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('app-view').classList.remove('hidden');
+            
+            const tbA = document.getElementById('abril-tbody');
+            const tbM = document.getElementById('marzo-tbody');
+            if(tbA.innerHTML.trim() === "") {
+                abrilData.forEach(i => tbA.innerHTML += buildRow(i, true));
+                marzoData.forEach(i => tbM.innerHTML += buildRow(i, false));
             }
         }
 
-        // LOGIN FORM
+        // LOGIN SUBMIT
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const userVal = document.getElementById('username').value.trim();
-            const passVal = document.getElementById('password').value.trim();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
             const errorEl = document.getElementById('login-error');
             const btn = document.getElementById('btn-login');
             
-            if (userVal !== 'sjemartinez' || passVal !== 'Coosajo2041') {
-                errorEl.innerText = "Credenciales incorrectas para Vinculación Social.";
+            if (u !== 'sjemartinez' || p !== 'Coosajo2041') {
+                errorEl.innerText = "ACCESO DENEGADO: CREDENCIALES INVÁLIDAS";
                 errorEl.classList.remove('hidden');
                 return;
             }
 
             errorEl.classList.add('hidden');
             btn.disabled = true;
-            document.getElementById('btn-text').innerText = "Validando acceso...";
+            btn.innerText = "ESTABLECIENDO ENLACE...";
 
             try {
-                // REGLA 3: Auth obligatoria
+                // REGLA 3: Auth mandatoria
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
-                // El cambio de vista lo hará el onAuthStateChanged
-            } catch (error) {
-                console.error("Auth Failure:", error);
-                errorEl.innerText = "Error de conexión. Intente de nuevo.";
+                // Forzamos el cambio de vista inmediatamente tras la promesa
+                showApp();
+            } catch (err) {
+                console.error(err);
+                errorEl.innerText = "ERROR DE SERVIDOR: VERIFIQUE SU CONEXIÓN";
                 errorEl.classList.remove('hidden');
                 btn.disabled = false;
-                document.getElementById('btn-text').innerText = "Ingresar al Reporte";
+                btn.innerText = "ACCEDER AHORA";
             }
         });
 
@@ -401,22 +399,13 @@
             document.getElementById('section-marzo').style.display = (v === 'todos' || v === 'marzo') ? 'block' : 'none';
         });
 
-        // OBSERVADOR DE ESTADO (Cerebro de la App)
+        // OBSERVADOR GLOBAL (Sincronizador)
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                switchView(true);
+                showApp();
                 
-                const tbA = document.getElementById('abril-tbody');
-                const tbM = document.getElementById('marzo-tbody');
-                
-                // Generar tablas solo si están vacías
-                if(tbA.innerHTML.trim() === "") {
-                    abrilData.forEach(i => tbA.innerHTML += buildRow(i, true));
-                    marzoData.forEach(i => tbM.innerHTML += buildRow(i, false));
-                }
-
-                // Sincronización en tiempo real
-                const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'coosajo_report_final');
+                // Conectar Snapshot
+                const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'coosajo_v3');
                 unsubscribeSnapshot = onSnapshot(postsRef, (snapshot) => {
                     document.getElementById('loading-indicator').classList.add('hidden');
                     document.getElementById('tables-container').classList.remove('hidden');
@@ -445,11 +434,14 @@
                         }
                     });
                 }, (err) => {
-                    console.error("Firestore Error:", err);
-                    document.getElementById('loading-indicator').innerHTML = `<p class="text-red-500 font-bold p-4">Error de permisos. Contacte soporte.</p>`;
+                    console.error(err);
+                    const eMsg = document.getElementById('error-db-msg');
+                    eMsg.innerText = "Error de sincronización: " + err.message;
+                    eMsg.classList.remove('hidden');
                 });
             } else {
-                switchView(false);
+                document.getElementById('login-view').classList.remove('hidden');
+                document.getElementById('app-view').classList.add('hidden');
                 if (unsubscribeSnapshot) unsubscribeSnapshot();
             }
         });
