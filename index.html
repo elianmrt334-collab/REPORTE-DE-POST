@@ -49,6 +49,15 @@
         th { position: sticky; top: 0; z-index: 10; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Estilo para el botón de borrar */
+        .btn-delete-row {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        tr:hover .btn-delete-row {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800">
@@ -63,23 +72,23 @@
                     <div id="logo-text-fallback" class="hidden font-black text-4xl text-coosajo-blue tracking-tighter italic">COOSAJO</div>
                 </div>
                 <h2 class="text-2xl font-black text-slate-800">Reporte Digital</h2>
-                <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-widest">Marzo y Abril</p>
+                <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-widest">Gestión de Publicaciones</p>
             </div>
             <form id="login-form" class="space-y-5">
                 <div>
                     <label class="block text-xs font-black text-slate-500 mb-2 uppercase ml-1">Usuario</label>
-                    <input type="text" id="username" value="sjemartinez" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all font-medium">
+                    <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all font-medium" placeholder="Ingrese su usuario">
                 </div>
                 <div>
                     <label class="block text-xs font-black text-slate-500 mb-2 uppercase ml-1">Contraseña</label>
-                    <input type="password" id="password" value="Coosajo2041" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all font-medium">
+                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all font-medium" placeholder="••••••••">
                 </div>
                 <div id="login-error" class="hidden text-[11px] text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 font-bold text-center"></div>
                 <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-black py-4 px-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
                     ACCEDER AL REPORTE
                 </button>
             </form>
-            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.1</p>
+            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.2</p>
         </div>
     </div>
 
@@ -184,10 +193,27 @@
         </main>
     </div>
 
+    <!-- Modal Simple de Confirmación -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full text-center">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 mb-2">¿Eliminar esta fila?</h3>
+            <p class="text-slate-500 text-sm mb-6">Esta acción ocultará la fila permanentemente del reporte.</p>
+            <div class="flex gap-3">
+                <button id="cancel-delete" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition">Cancelar</button>
+                <button id="confirm-delete" class="flex-1 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition shadow-lg shadow-red-200">Sí, eliminar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // CONFIGURACIÓN FIREBASE ELIÁN
         const firebaseConfig = {
@@ -208,6 +234,7 @@
 
         let unsubscribeSnapshot = null;
         let debounceTimers = {};
+        let currentDeleteId = null;
 
         // Datos de ABRIL - Mantener tal cual estaban
         const abrilData = [
@@ -237,9 +264,8 @@
             { id: "A24", fecha: "30 abr", eje: "Finanzas", frase: "Tener un presupuesto personal te da libertad real." }
         ];
 
-        // Datos de MARZO - Listado actualizado removiendo las 4 frases solicitadas
+        // Datos de MARZO - Depurados (Removidas las 4 frases)
         const marzoData = [
-            // Registros de las capturas (M01-M12) - SE MANTIENEN IDÉNTICOS
             { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Acompañamos a mujeres en su crecimiento." },
             { id: "M02", frase: "Creer en el poder propio impulsa el negocio.", copy: "Formación y confianza para emprendedoras." },
             { id: "M03", frase: "Emprender es florecer por dentro.", copy: "Academia para construir negocios con identidad." },
@@ -252,7 +278,6 @@
             { id: "M10", frase: "Un emprendedor con dirección llega lejos.", copy: "Acompañamos tus pasos con propósito real." },
             { id: "M11", frase: "Cada emprendimiento tiene un camino.", copy: "Orientación para fortalecer tu marca desde la esencia." },
             { id: "M12", frase: "Herramientas digitales abren nuevas puertas.", copy: "RED: Conectando con conocimiento que impulsa." },
-            // Registros restantes depurados
             { id: "M13", frase: "Dominar herramientas digitales es abrir nuevas puertas para tu emprendimiento.", copy: "RED te conecta con conocimiento actual que impulsa tu marca en el mundo digital." },
             { id: "M14", frase: "Un emprendedor digital está preparado para los desafíos del futuro.", copy: "Te acompañamos para que tu negocio aproveche todo el potencial de la era digital." },
             { id: "M15", frase: "El mundo avanza rápido, y tu negocio puede avanzar con él.", copy: "En RED aprendemos herramientas tecnológicas que ayudan a emprender mejor." },
@@ -314,8 +339,37 @@
 
         window.delImg = (id) => { window.saveData(id, 'image', null); };
 
+        // Función para borrar fila (Elián)
+        window.askDeleteRow = (id) => {
+            currentDeleteId = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        };
+
+        document.getElementById('cancel-delete').addEventListener('click', () => {
+            document.getElementById('delete-modal').classList.add('hidden');
+            currentDeleteId = null;
+        });
+
+        document.getElementById('confirm-delete').addEventListener('click', async () => {
+            if (!currentDeleteId) return;
+            try {
+                // Marcamos como borrado en la base de datos
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'registros', currentDeleteId);
+                await setDoc(docRef, { deleted: true }, { merge: true });
+                
+                // Ocultamos localmente
+                const tr = document.querySelector(`tr[data-id="${currentDeleteId}"]`);
+                if (tr) tr.classList.add('hidden');
+                
+                document.getElementById('delete-modal').classList.add('hidden');
+                currentDeleteId = null;
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
         const buildRow = (item, isAbril) => `
-            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 group">
+            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 group" data-id="${item.id}">
                 ${isAbril ? `
                     <td class="p-5 border-r font-black text-coosajo-blue text-xs">${item.fecha}</td>
                     <td class="p-5 border-r text-slate-700 text-[10px] font-black uppercase leading-tight">${item.eje}</td>
@@ -340,14 +394,26 @@
                         class="w-full bg-slate-50 border border-slate-200 p-4 text-xs rounded-2xl focus:ring-2 focus:ring-coosajo-green font-medium"></textarea>
                 </td>
 
-                <td class="p-5 align-top text-center">
-                    <label class="no-print cursor-pointer bg-[#1e293b] hover:bg-slate-900 text-white text-[10px] py-3 px-2 rounded-xl block mb-2 transition active:scale-95 font-black uppercase">
-                        Subir Foto
-                        <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
-                    </label>
-                    <div id="img-box-${item.id}" class="hidden">
-                        <img id="img-${item.id}" src="" class="w-full max-h-32 object-contain border rounded-2xl mx-auto shadow-md bg-white">
-                        <button class="no-print text-[10px] text-red-500 font-black uppercase mt-2 hover:underline" onclick="window.delImg('${item.id}')">Eliminar</button>
+                <td class="p-5 align-top text-center relative">
+                    <div class="flex flex-col gap-2">
+                        <label class="no-print cursor-pointer bg-[#1e293b] hover:bg-slate-900 text-white text-[10px] py-3 px-2 rounded-xl block transition active:scale-95 font-black uppercase">
+                            Subir Foto
+                            <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
+                        </label>
+                        
+                        <div id="img-box-${item.id}" class="hidden">
+                            <img id="img-${item.id}" src="" class="w-full max-h-32 object-contain border rounded-2xl mx-auto shadow-md bg-white">
+                            <button class="no-print text-[10px] text-red-500 font-black uppercase mt-2 hover:underline" onclick="window.delImg('${item.id}')">Eliminar Imagen</button>
+                        </div>
+
+                        <!-- Botón de Borrar Fila - Solo para Elián -->
+                        <button onclick="window.askDeleteRow('${item.id}')" 
+                                class="btn-delete-row no-print mt-2 flex items-center justify-center gap-1 text-[9px] text-red-400 font-bold hover:text-red-600 uppercase transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Borrar Fila
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -362,7 +428,7 @@
             }
         }
 
-        // LOGIN SUBMIT
+        // LOGIN SUBMIT (Actualizado con sjjardon)
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const u = document.getElementById('username').value.trim();
@@ -370,8 +436,10 @@
             const errorEl = document.getElementById('login-error');
             const btn = document.getElementById('btn-login');
             
-            if (u !== 'sjemartinez' || p !== 'Coosajo2041') {
-                errorEl.innerText = "ACCESO DENEGADO"; errorEl.classList.remove('hidden'); return;
+            const validUsers = ['sjemartinez', 'sjjardon'];
+            
+            if (!validUsers.includes(u) || p !== 'Coosajo2041') {
+                errorEl.innerText = "USUARIO O CONTRASEÑA INCORRECTOS"; errorEl.classList.remove('hidden'); return;
             }
             errorEl.classList.add('hidden'); btn.disabled = true; btn.innerText = "AUTENTICANDO...";
             try {
@@ -379,7 +447,7 @@
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('app-view').classList.remove('hidden');
             } catch (err) {
-                errorEl.innerText = "ERROR DE SERVIDOR"; errorEl.classList.remove('hidden');
+                errorEl.innerText = "ERROR DE CONEXIÓN"; errorEl.classList.remove('hidden');
                 btn.disabled = false; btn.innerText = "ACCEDER AL REPORTE";
             }
         });
@@ -401,6 +469,14 @@
                     document.getElementById('tables-container').classList.remove('hidden');
                     snapshot.docChanges().forEach((change) => {
                         const data = change.doc.data(); const id = change.doc.id;
+                        
+                        // Si está marcada como borrada, ocultar
+                        if (data.deleted === true) {
+                            const tr = document.querySelector(`tr[data-id="${id}"]`);
+                            if (tr) tr.classList.add('hidden');
+                            return;
+                        }
+
                         const st = document.getElementById(`st-${id}`);
                         if (st && st.value !== data.status) st.value = data.status || 'publicado_igual';
                         const rs = document.getElementById(`rs-${id}`);
