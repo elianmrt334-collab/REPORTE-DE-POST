@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Publicaciones - Vinculación Social</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coosajo: {
+                            blue: '#0047BA',  /* Azul principal */
+                            green: '#006B3F', /* Verde secundario */
+                            light: '#F0F6FF'  /* Blanco/Azul super claro */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            body { background-color: white; color: black; font-size: 10pt; }
+            .no-print { display: none !important; }
+            #login-view { display: none !important; }
+            #app-view { display: block !important; }
+            /* Ajustes para tabla en impresión */
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #d1d5db !important; padding: 8px !important; }
+            th { background-color: #0047BA !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            tr { page-break-inside: avoid; }
+            textarea {
+                border: none !important;
+                resize: none !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
+                overflow: hidden;
+                min-height: 20px;
+                padding: 0 !important;
+                width: 100%;
+                font-family: inherit;
+            }
+            select {
+                appearance: none;
+                border: none !important;
+                background: transparent !important;
+                font-weight: bold;
+                color: black !important;
+                padding: 0 !important;
+            }
+            img { page-break-inside: avoid; max-height: 150px !important; }
+        }
+        textarea {
+            transition: border-color 0.2s;
+        }
+        .table-container { overflow-x: auto; }
+        th { top: 0; position: sticky; z-index: 10; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <!-- Pantalla de Login -->
+    <div id="login-view" class="fixed inset-0 bg-coosajo-blue flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md mx-4">
+            <div class="text-center mb-8">
+                <img src="logo coosajo baja resolución.png" alt="Logo Coosajo" class="h-20 mx-auto mb-4 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x80/ffffff/0047BA?text=COOSAJO';">
+                <h2 class="text-2xl font-extrabold text-gray-800">Acceso al Sistema</h2>
+                <p class="text-sm text-gray-500 mt-1">Reportes de Vinculación Social</p>
+            </div>
+            <form onsubmit="window.handleLogin(event)" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Usuario</label>
+                    <input type="text" id="username" class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-2 focus:ring-coosajo-blue focus:outline-none" placeholder="Ej: emartinez" autocomplete="username">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
+                    <input type="password" id="password" class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-2 focus:ring-coosajo-blue focus:outline-none" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <div id="login-error" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200 font-medium"></div>
+                <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition shadow-md">Ingresar</button>
+            </form>
+            <p class="text-xs text-center text-gray-400 mt-6">Conectado a Firebase Database</p>
+        </div>
+    </div>
+
+    <!-- Contenido Principal (Oculto hasta hacer login) -->
+    <div id="app-view" class="hidden min-h-screen flex flex-col">
+        <!-- Header / Navbar -->
+        <header class="bg-coosajo-blue text-white shadow-lg print:shadow-none print:bg-transparent print:text-black print:border-b print:border-gray-300">
+            <div class="max-w-[1400px] mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <img src="logo coosajo baja resolución.png" alt="Logo Coosajo" class="h-12 w-auto bg-white p-1 rounded" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x60/ffffff/0047BA?text=COOSAJO';">
+                    <div class="ml-4">
+                        <h1 class="text-xl font-bold">Reporte de Publicaciones</h1>
+                        <p class="text-green-300 font-semibold text-sm print:text-gray-600">Vinculación Social</p>
+                    </div>
+                </div>
+                <div class="no-print flex flex-wrap gap-3 items-center mt-4 md:mt-0">
+                    <div class="text-sm font-medium mr-2 bg-blue-800 px-3 py-1 rounded">👤 <span id="user-display">emartinez</span></div>
+                    <!-- Filtro de meses -->
+                    <div class="flex items-center bg-white rounded shadow px-3 py-1.5 border border-gray-200">
+                        <label for="monthFilter" class="text-sm font-bold text-coosajo-blue mr-2">Filtrar:</label>
+                        <select id="monthFilter" onchange="window.filterMonths()" class="text-sm text-gray-700 focus:outline-none cursor-pointer bg-transparent">
+                            <option value="todos">Todos los meses</option>
+                            <option value="abril">Solo Abril</option>
+                            <option value="marzo">Solo Marzo</option>
+                        </select>
+                    </div>
+                    
+                    <button onclick="window.handleLogout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition text-sm font-medium">
+                        Cerrar Sesión
+                    </button>
+                    <button onclick="window.print()" class="bg-coosajo-green hover:bg-green-700 text-white px-4 py-2 rounded shadow transition text-sm font-bold flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Exportar PDF
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-[1400px] mx-auto px-4 py-8 sm:px-6 lg:px-8 flex-1 w-full">
+            
+            <div id="loading-indicator" class="text-center py-10">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-coosajo-blue"></div>
+                <p class="mt-2 text-gray-500 font-medium text-sm">Sincronizando con Firebase...</p>
+            </div>
+
+            <div id="tables-container" class="hidden">
+                <!-- Sección ABRIL -->
+                <section id="section-abril" class="mb-12">
+                    <h2 class="text-2xl font-extrabold text-coosajo-blue border-b-4 border-coosajo-green inline-block mb-4 pb-1">Reporte Abril</h2>
+                    
+                    <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 table-container">
+                        <table class="min-w-full text-left text-sm whitespace-normal">
+                            <thead class="bg-coosajo-blue text-white print:text-black print:bg-gray-200">
+                                <tr>
+                                    <th class="p-3 w-24">Fecha</th>
+                                    <th class="p-3 w-32">Eje</th>
+                                    <th class="p-3 w-48">Frase Original</th>
+                                    <th class="p-3 w-40">Estado del Post</th>
+                                    <th class="p-3 min-w-[200px]">Post Publicado (Final)</th>
+                                    <th class="p-3 min-w-[200px]">Motivo de Modificación</th>
+                                    <th class="p-3 w-48">Imagen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="abril-tbody" class="divide-y divide-gray-200">
+                                <!-- Contenido JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Sección MARZO -->
+                <section id="section-marzo" class="mb-12">
+                    <h2 class="text-2xl font-extrabold text-coosajo-blue border-b-4 border-coosajo-green inline-block mb-4 pb-1">Reporte Marzo</h2>
+                    
+                    <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 table-container">
+                        <table class="min-w-full text-left text-sm whitespace-normal">
+                            <thead class="bg-coosajo-blue text-white print:text-black print:bg-gray-200">
+                                <tr>
+                                    <th class="p-3 w-48">Frase Original</th>
+                                    <th class="p-3 w-48">Copy Original</th>
+                                    <th class="p-3 w-40">Estado del Post</th>
+                                    <th class="p-3 min-w-[200px]">Post Publicado (Final)</th>
+                                    <th class="p-3 min-w-[200px]">Motivo de Modificación</th>
+                                    <th class="p-3 w-48">Imagen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marzo-tbody" class="divide-y divide-gray-200">
+                                <!-- Contenido JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts Data y Firebase Module -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==========================================
+        // CONFIGURACIÓN FIREBASE (PARA TU GITHUB)
+        // ==========================================
+        // Cuando lo subas a tu servidor/github, reemplaza el contenido de este bloque con los datos de tu Firebase.
+        const miFirebaseConfig = {
+            apiKey: "FuCJ3RS0yTbJaIVoWGyaaRIER2t50zHaE8GOz0fQ", // Como IA no tengo acceso a tu llave privada, pégala aquí luego
+            authDomain: "costos-comunicacion-digital.firebaseapp.com",
+            databaseURL: "https://costos-comunicacion-digital-default-rtdb.firebaseio.com",
+            projectId: "costos-comunicacion-digital",
+            storageBucket: "costos-comunicacion-digital.firebasestorage.app",
+            messagingSenderId: "299496606379",
+            appId: "1:299496606379:web:a4d6609ff79eebff0c85ee",
+            measurementId: "G-D7GGDWSWKY"
+        };
+
+        // Lógica automática para detectar si está en previsualización o ya en tu sitio
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : miFirebaseConfig;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'coosajo-reportes';
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        let currentUserId = null;
+        let unsubscribeSnapshot = null;
+        let debounceTimers = {};
+
+        // Datos Originales Extraídos
+        const abrilData = [
+            { id: "A01", fecha: "7 de abril", eje: "Programas de becas", frase: "El cooperativismo convierte el esfuerzo colectivo en oportunidades reales." },
+            { id: "A02", fecha: "8 de abril", eje: "Educación financiera", frase: "En el cooperativismo, un asociado informado es un asociado empoderado." },
+            { id: "A03", fecha: "9 de abril", eje: "Educación ambiental y sostenibilidad agrícola", frase: "Proteger a la naturaleza es proteger a las próximas generaciones." },
+            { id: "A04", fecha: "10 de abril", eje: "Empoderamiento económico de las mujeres", frase: "El cooperativismo impulsa la participación económica de las mujeres." },
+            { id: "A05", fecha: "11 de abril", eje: "Formación técnica", frase: "Aprender un oficio es formarse para producir con valores y pensar en comunidad." },
+            { id: "A06", fecha: "12 de abril", eje: "Programas de becas", frase: "Nuestra cooperativa educa, apoya y cree en el mañana." },
+            { id: "A07", fecha: "13 de abril", eje: "Desarrollo juvenil", frase: "Juventud + cooperativismo = ideas que se transforman comunidades" },
+            { id: "A08", fecha: "14 de abril", eje: "Educación financiera", frase: "El cooperativismo promueve el crédito responsable para evitar problemas futuros." },
+            { id: "A09", fecha: "15 de abril", eje: "Educación ambiental y sostenibilidad agrícola", frase: "Cuidar la naturaleza es un acto cooperativo: lo que protegemos juntos, perdura para todos." },
+            { id: "A10", fecha: "16 de abril", eje: "Desarrollo empresarial y fomento al emprendimiento", frase: "Emprender juntos nos hace más fuertes: el cooperativismo convierte los sueños individuales en logros colectivos." },
+            { id: "A11", fecha: "17 de abril", eje: "Programas de becas", frase: "Nuestros programas de becas nacen de la ayuda mutua y la solidaridad cooperativa." },
+            { id: "A12", fecha: "18 de abril", eje: "Formación técnica", frase: "La formación técnica fortalece capacidades; el cooperativismo las convierte en oportunidades." },
+            { id: "A13", fecha: "19 de abril", eje: "Educación financiera", frase: "La educación financiera cooperativa no solo habla de dinero, habla de valores." },
+            { id: "A14", fecha: "20 de abril", eje: "Educación ambiental y sostenibilidad agrícola", frase: "Cooperar también es proteger la vida y los recursos naturales que compartimos." },
+            { id: "A15", fecha: "21 de abril", eje: "Desarrollo juvenil", frase: "El cooperativismo empodera a la juventud para liderar el cambio con valores." },
+            { id: "A16", fecha: "22 de abril", eje: "Empoderamiento económico de las mujeres", frase: "Cuando las mujeres crecen, la comunidad progresa." },
+            { id: "A17", fecha: "23 de abril", eje: "Programas de becas", frase: "Invertimos en educación porque creemos en el desarrollo de las personas y la comunidad." },
+            { id: "A18", fecha: "24 de abril", eje: "Formación técnica", frase: "Desde el cooperativismo, la formación técnica no solo enseña a hacer, también enseña a construir juntos." },
+            { id: "A19", fecha: "25 de abril", eje: "Educación financiera", frase: "El ahorro cooperativo no se trata solo de guardar dinero, sino de construir futuro." },
+            { id: "A20", fecha: "26 de abril", eje: "Desarrollo juvenil", frase: "El cooperativismo convierte el talento de los jóvenes en desarrollo comunitario." },
+            { id: "A21", fecha: "27 de abril", eje: "Educación ambiental y sostenibilidad agrícola", frase: "En el cooperativismo, el cuidado del medio ambiente es un compromiso de todos." },
+            { id: "A22", fecha: "28 de abril", eje: "Programas de becas", frase: "En la cooperativa creemos en las personas porque cuando una persona estudia, toda una comunidad avanza." },
+            { id: "A23", fecha: "29 de abril", eje: "Desarrollo empresarial y fomento al emprendimiento", frase: "Cuando el talento se une y el propósito se comparte, el cooperativismo transforma comunidades." },
+            { id: "A24", fecha: "30 de abril", eje: "Educación financiera", frase: "Tener un presupuesto personal es una herramienta que te da libertad." }
+        ];
+
+        const marzoData = [
+            { id: "M01", frase: "Cuando una mujer se descubre a sí misma, todo en su vida comienza a florecer.", copy: "En FLORECE acompañamos a mujeres que desean crecer, emprender y transformar su historia desde la fuerza interior." },
+            { id: "M02", frase: "Cuando una mujer cree en su poder, su emprendimiento encuentra camino para crecer.", copy: "A través de formación y acompañamiento, impulsamos el emprendimiento femenino con propósito y confianza." },
+            { id: "M03", frase: "El primer paso para emprender es florecer por dentro.", copy: "En nuestra academia fortalecemos a mujeres que desean construir un negocio desde su identidad y su valor." },
+            { id: "M04", frase: "Cada mujer es una semilla llena de posibilidades que espera florecer.", copy: "FLORECE ofrece el espacio, el acompañamiento y las herramientas para que cada mujer alcance su máximo potencial." },
+            { id: "M05", frase: "Empoderarse es florecer, emprender es extender sus raíces hacia el futuro.", copy: "Fortalecemos emprendimientos liderados por mujeres para que crezcan con bases firmes." },
+            { id: "M06", frase: "Cuando una mujer florece, toda su comunidad florece con ella.", copy: "Impulsamos procesos que transforman familias, negocios y realidades a través del crecimiento femenino." },
+            { id: "M07", frase: "Emprender con dirección clara convierte los sueños en proyectos reales y sostenibles.", copy: "En BRÚJULA acompañamos a emprendedores para que encuentren estrategia, visión y rumbo definido." },
+            { id: "M08", frase: "Tu idea ya tiene valor; lo que necesita es dirección para crecer.", copy: "Te guiamos paso a paso para que tu emprendimiento avance con seguridad." },
+            { id: "M09", frase: "Todo emprendedor necesita una brújula que le recuerde hacia dónde quiere llegar.", copy: "Trabajamos contigo para fortalecer tu negocio desde una visión estratégica." },
+            { id: "M10", frase: "Los negocios sólidos nacen de decisiones guiadas y objetivos claros.", copy: "BRÚJULA es el espacio donde los emprendedores encuentran claridad y acompañamiento." },
+            { id: "M11", frase: "Un emprendedor con dirección puede llegar más lejos de lo que imagina.", copy: "Acompañamos tus pasos para que tu proyecto avance con propósito." },
+            { id: "M12", frase: "Cada emprendimiento tiene un camino; nosotros te ayudamos a trazarlo.", copy: "BRÚJULA brinda orientación para fortalecer tu negocio desde su esencia." },
+            { id: "M13", frase: "Dominar herramientas digitales es abrir nuevas puertas para tu emprendimiento.", copy: "RED te conecta con conocimiento actual que impulsa tu marca en el mundo digital." },
+            { id: "M14", frase: "Un emprendedor digital está preparado para los desafíos del futuro.", copy: "Te acompañamos para que tu negocio aproveche todo el potencial de la era digital." },
+            { id: "M15", frase: "El mundo avanza rápido, y tu negocio puede avanzar con él.", copy: "En RED aprendemos herramientas tecnológicas que ayudan a emprender mejor." },
+            { id: "M16", frase: "Lo digital no es el futuro, es el presente, y tu emprendimiento merece estar ahí.", copy: "Te brindamos formación práctica para crecer de manera moderna y eficiente." },
+            { id: "M17", frase: "Una marca con presencia digital tiene más oportunidades de crecer.", copy: "RED impulsa a emprendedores a fortalecer su comunicación y proyección online." },
+            { id: "M18", frase: "Tus habilidades digitales pueden llevar tu emprendimiento más lejos.", copy: "Descubre nuevas formas de emprender a través de herramientas tecnológicas." },
+            { id: "M19", frase: "Cuando un joven descubre su capacidad de crear, todo su futuro cambia.", copy: "ACCESO JOVEN despierta el interés de emprender e innovar." },
+            { id: "M20", frase: "La innovación nace en una mente joven que se atreve a imaginar nuevas soluciones.", copy: "Impulsamos habilidades para que los jóvenes transformen ideas en proyectos reales." },
+            { id: "M21", frase: "Emprender comienza con un sueño y una mente lista para aprender.", copy: "Acompañamos a jóvenes en el inicio de su camino emprendedor." },
+            { id: "M22", frase: "Cada joven tiene un potencial enorme; solo necesita descubrirlo.", copy: "ACCESO JOVEN fomenta liderazgo, creatividad y visión de futuro." },
+            { id: "M23", frase: "Cuando los jóvenes se atreven a innovar, las comunidades avanzan.", copy: "Formamos una generación con ganas de emprender y cambiar su entorno." },
+            { id: "M24", frase: "El futuro está en manos de jóvenes que creen en sus ideas.", copy: "Les brindamos espacios para aprender, descubrir y emprender con propósito." },
+            { id: "M25", frase: "Un oficio aprendido es una oportunidad para toda la vida.", copy: "Formación técnica que fortalece tu futuro laboral." },
+            { id: "M26", frase: "Las habilidades técnicas abren puertas que llevan a nuevas oportunidades.", copy: "Aprende haciendo y descubre tu potencial." },
+            { id: "M27", frase: "Un curso técnico puede ser el inicio de una nueva historia profesional.", copy: "Capacitación especializada para crecer en el mundo laboral." },
+            { id: "M28", frase: "Tu talento se potencia cuando desarrollas nuevas habilidades.", copy: "Nuestros cursos técnicos están diseñados para impulsar tu capacidad." },
+            { id: "M29", frase: "El conocimiento aplicado genera resultados reales.", copy: "Formación práctica para enfrentar desafíos actuales." },
+            { id: "M30", frase: "Aprender un oficio es invertir en un futuro más seguro.", copy: "Te ofrecemos herramientas para mejorar tus oportunidades." },
+            { id: "M31", frase: "La excelencia académica transforma vidas y abre puertas que parecían imposibles.", copy: "Acompañamos a estudiantes que destacan por su esfuerzo y dedicación." },
+            { id: "M32", frase: "El talento necesita oportunidades, y las oportunidades crean movilidad social.", copy: "Becas Excelencia impulsa a jóvenes que creen en el poder de estudiar." },
+            { id: "M33", frase: "Cada logro académico es un paso más hacia tus sueños.", copy: "Reconocemos y apoyamos a quienes demuestran compromiso." },
+            { id: "M34", frase: "La educación te lleva a lugares que jamás imaginaste.", copy: "Becas que acompañan tu camino hacia un mejor futuro." },
+            { id: "M35", frase: "Tu esfuerzo merece una oportunidad para brillar.", copy: "Becas Excelencia brinda apoyo a quienes destacan por su rendimiento." },
+            { id: "M36", frase: "El conocimiento es una herramienta poderosa que te abre camino.", copy: "Con becas Excelencia impulsamos estudiantes con sueños, metas y determinación." },
+            { id: "M37", frase: "Cuando enseñamos valores desde pequeños, sembramos adultos responsables.", copy: "Wachalal forma niños y jóvenes con visión financiera y cooperativa." },
+            { id: "M38", frase: "La educación temprana construye bases para un futuro más fuerte.", copy: "Promovemos aprendizaje significativo desde la niñez." },
+            { id: "M39", frase: "Los niños que aprenden a cooperar crecen siendo mejores ciudadanos.", copy: "Wachalal impulsa valores que unen y transforman." },
+            { id: "M40", frase: "La educación financiera también empieza jugando y aprendiendo.", copy: "Enseñamos herramientas útiles para el futuro." },
+            { id: "M41", frase: "Mejorar tus finanzas es mejorar la calidad de vida de tu familia.", copy: "HUELLAS te enseña a tomar decisiones financieras seguras." },
+            { id: "M42", frase: "La educación financiera te permite caminar con más seguridad hacia tus metas.", copy: "Te acompañamos a administrar mejor tus recursos." },
+            { id: "M43", frase: "Organizar tus finanzas es un acto de amor hacia tu futuro.", copy: "HUELLAS ofrece herramientas para una vida más estable." },
+            { id: "M44", frase: "Un buen manejo del dinero transforma realidades.", copy: "Enseñamos conocimientos prácticos para mejorar tu economía." },
+            { id: "M45", frase: "Las habilidades blandas construyen relaciones, oportunidades y crecimiento personal.", copy: "Formación para fortalecer tu comunicación, liderazgo y confianza." },
+            { id: "M46", frase: "Tu actitud, tu forma de comunicar y tu manera de liderar también se aprenden.", copy: "Educación continua para crecer desde el interior." },
+            { id: "M47", frase: "El desarrollo personal es el inicio del desarrollo profesional.", copy: "Habilidades blandas que impulsan tu éxito." },
+            { id: "M48", frase: "Mejorar tus habilidades humanas abre puertas en cualquier ámbito.", copy: "Te apoyamos a descubrir tu mejor versión." },
+            { id: "M49", frase: "Una comunidad unida puede lograr cambios que parecían inalcanzables.", copy: "Fortalecemos grupos que construyen soluciones colectivas." },
+            { id: "M50", frase: "Cuando las personas se organizan, el progreso se vuelve posible.", copy: "Acompañamos procesos que fortalecen participación local." },
+            { id: "M51", frase: "La organización comunitaria es la base del desarrollo sostenible.", copy: "Impulsamos la unión, la participación y el liderazgo." },
+            { id: "M52", frase: "Juntos, las soluciones nacen y los sueños avanzan.", copy: "Apoyamos comunidades que desean crecer desde la coordinación." },
+            { id: "M53", frase: "Las mujeres que se apoyan entre sí construyen oportunidades donde antes no las había.", copy: "RSWR impulsa redes de autoayuda para crear microemprendimientos." },
+            { id: "M54", frase: "La autoayuda convierte pequeños esfuerzos en grandes cambios.", copy: "Fortalecemos procesos que generan autonomía económica." },
+            { id: "M55", frase: "Cuando una mujer emprende acompañada, su negocio crece con más fuerza.", copy: "RSWR une mujeres para que avancen juntas." },
+            { id: "M56", frase: "La solidaridad entre mujeres es motor de transformación comunitaria.", copy: "Juntas construyen negocios y nuevas posibilidades." },
+            { id: "M57", frase: "El desarrollo del campo comienza con formación y oportunidad.", copy: "Acompañamos productores para impulsar su crecimiento." },
+            { id: "M58", frase: "Sembrar conocimiento es la base para cosechar mejores resultados.", copy: "Formación agrícola que impulsa sostenibilidad y productividad." },
+            { id: "M59", frase: "El campo avanza cuando quienes lo trabajan también crecen.", copy: "Construimos procesos que fortalecen prácticas agropecuarias." },
+            { id: "M60", frase: "Cada cultivo cuenta una historia de esfuerzo, disciplina y aprendizaje.", copy: "Apoyamos a agricultores para mejorar su producción." }
+        ];
+
+        // ==========================================
+        // FUNCIONES GLOBALES DE UI Y BASE DE DATOS
+        // ==========================================
+        
+        window.saveToFirebase = (id, type, value) => {
+            if (!currentUserId) return;
+            // Debounce para no saturar firebase con cada tecla
+            clearTimeout(debounceTimers[`${id}_${type}`]);
+            debounceTimers[`${id}_${type}`] = setTimeout(() => {
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'posts', id);
+                setDoc(docRef, { [type]: value }, { merge: true })
+                    .catch(err => console.error("Error guardando datos:", err));
+            }, 800);
+        };
+
+        // Autoajuste de cajas de texto
+        window.autoResize = (el) => {
+            if(!el) return;
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
+        };
+
+        window.handleImageUpload = (event, id) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                    window.saveToFirebase(id, 'image', dataUrl);
+                    
+                    // Actualizar UI Local inmediato
+                    document.getElementById(`preview-${id}`).src = dataUrl;
+                    document.getElementById(`preview-container-${id}`).classList.remove('hidden');
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        };
+
+        window.removeImage = (id) => {
+            window.saveToFirebase(id, 'image', null);
+            document.getElementById(`preview-${id}`).src = "";
+            document.getElementById(`preview-container-${id}`).classList.add('hidden');
+            const fileInput = document.querySelector(`input[onchange*="'${id}'"]`);
+            if(fileInput) fileInput.value = "";
+        };
+
+        window.filterMonths = () => {
+            const filterValue = document.getElementById('monthFilter').value;
+            const secAbril = document.getElementById('section-abril');
+            const secMarzo = document.getElementById('section-marzo');
+
+            if (filterValue === 'todos') {
+                secAbril.style.display = 'block';
+                secMarzo.style.display = 'block';
+            } else if (filterValue === 'abril') {
+                secAbril.style.display = 'block';
+                secMarzo.style.display = 'none';
+            } else if (filterValue === 'marzo') {
+                secAbril.style.display = 'none';
+                secMarzo.style.display = 'block';
+            }
+        };
+
+        // ==========================================
+        // SISTEMA DE LOGIN (EXCLUSIVO EMARTINEZ)
+        // ==========================================
+        window.handleLogin = async (e) => {
+            e.preventDefault();
+            const userVal = document.getElementById('username').value.trim().toLowerCase();
+            const passVal = document.getElementById('password').value.trim();
+            const errorEl = document.getElementById('login-error');
+            const btn = document.getElementById('btn-login');
+            
+            errorEl.classList.add('hidden');
+
+            if (userVal !== 'emartinez') {
+                errorEl.innerText = "Acceso denegado: Solo el usuario 'emartinez' está autorizado para este reporte.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            if (passVal !== 'Coosajo.2025@') {
+                errorEl.innerText = "Contraseña incorrecta.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Ingresando...";
+
+            try {
+                // Si estamos en entorno inmersivo usamos el token especial, sino el autenticador normal
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    const email = "emartinez@coosajo.com"; // Mapeo automático
+                    try {
+                        await signInWithEmailAndPassword(auth, email, passVal);
+                    } catch (err) {
+                        // Si no existe, lo crea automáticamente la primera vez en tu Firebase
+                        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                            await createUserWithEmailAndPassword(auth, email, passVal);
+                        } else {
+                            throw err;
+                        }
+                    }
+                }
+            } catch (error) {
+                errorEl.innerText = "Error al iniciar sesión: Verifica tus credenciales.";
+                errorEl.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerText = "Ingresar";
+            }
+        };
+
+        window.handleLogout = async () => {
+            await signOut(auth);
+            location.reload(); // Recargar limpia el estado de las tablas visualmente
+        };
+
+        // ==========================================
+        // CONSTRUCCIÓN DE TABLAS Y SINCRONIZACIÓN
+        // ==========================================
+        function generateRowAbril(item) {
+            return `
+                <tr class="hover:bg-gray-50 align-top group" id="row-${item.id}">
+                    <td class="p-3 border-r border-gray-100"><strong class="text-coosajo-blue">${item.fecha}</strong></td>
+                    <td class="p-3 border-r border-gray-100 text-gray-700">${item.eje}</td>
+                    <td class="p-3 border-r border-gray-100 italic text-gray-600">"${item.frase}"</td>
+                    
+                    <td class="p-3 border-r border-gray-100">
+                        <select id="status-${item.id}"
+                            class="w-full border border-gray-300 rounded p-1.5 text-xs bg-white focus:ring-2 focus:ring-coosajo-blue font-medium"
+                            onchange="window.saveToFirebase('${item.id}', 'status', this.value)"
+                        >
+                            <option value="publicado_igual">🔵 Igual</option>
+                            <option value="modificado">🟢 Modificado</option>
+                            <option value="no_publicado">⚪ No publicado</option>
+                        </select>
+                    </td>
+
+                    <td class="p-3 border-r border-gray-100">
+                        <textarea id="post-${item.id}" rows="2" 
+                            class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-blue bg-coosajo-light" 
+                            placeholder="Escribe el post final..."
+                            oninput="window.autoResize(this); window.saveToFirebase('${item.id}', 'post', this.value)"
+                        ></textarea>
+                    </td>
+
+                    <td class="p-3 border-r border-gray-100">
+                        <textarea id="reason-${item.id}" rows="2" 
+                            class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-green" 
+                            placeholder="Añade un motivo..."
+                            oninput="window.autoResize(this); window.saveToFirebase('${item.id}', 'reason', this.value)"
+                        ></textarea>
+                    </td>
+
+                    <td class="p-3 text-center">
+                        <div class="no-print mb-2">
+                            <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs py-1.5 px-2 rounded border border-gray-300 inline-block w-full text-center transition">
+                                <span>Subir Foto</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, '${item.id}')">
+                            </label>
+                        </div>
+                        <div id="preview-container-${item.id}" class="relative hidden">
+                            <img id="preview-${item.id}" src="" class="w-full h-auto max-h-24 object-contain rounded border border-gray-200 bg-gray-50 print:max-h-32">
+                            <button class="no-print text-[10px] text-red-500 hover:text-red-700 underline font-medium mt-1" onclick="window.removeImage('${item.id}')">Quitar</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function generateRowMarzo(item) {
+            return `
+                <tr class="hover:bg-gray-50 align-top group" id="row-${item.id}">
+                    <td class="p-3 border-r border-gray-100 italic text-gray-600">"${item.frase}"</td>
+                    <td class="p-3 border-r border-gray-100 text-gray-700">${item.copy}</td>
+                    
+                    <td class="p-3 border-r border-gray-100">
+                        <select id="status-${item.id}"
+                            class="w-full border border-gray-300 rounded p-1.5 text-xs bg-white focus:ring-2 focus:ring-coosajo-blue font-medium"
+                            onchange="window.saveToFirebase('${item.id}', 'status', this.value)"
+                        >
+                            <option value="publicado_igual">🔵 Igual</option>
+                            <option value="modificado">🟢 Modificado</option>
+                            <option value="no_publicado">⚪ No publicado</option>
+                        </select>
+                    </td>
+
+                    <td class="p-3 border-r border-gray-100">
+                        <textarea id="post-${item.id}" rows="2" 
+                            class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-blue bg-coosajo-light" 
+                            placeholder="Escribe el post final..."
+                            oninput="window.autoResize(this); window.saveToFirebase('${item.id}', 'post', this.value)"
+                        ></textarea>
+                    </td>
+
+                    <td class="p-3 border-r border-gray-100">
+                        <textarea id="reason-${item.id}" rows="2" 
+                            class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-green" 
+                            placeholder="Añade un motivo..."
+                            oninput="window.autoResize(this); window.saveToFirebase('${item.id}', 'reason', this.value)"
+                        ></textarea>
+                    </td>
+
+                    <td class="p-3 text-center">
+                        <div class="no-print mb-2">
+                            <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs py-1.5 px-2 rounded border border-gray-300 inline-block w-full text-center transition">
+                                <span>Subir Foto</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, '${item.id}')">
+                            </label>
+                        </div>
+                        <div id="preview-container-${item.id}" class="relative hidden">
+                            <img id="preview-${item.id}" src="" class="w-full h-auto max-h-24 object-contain rounded border border-gray-200 bg-gray-50 print:max-h-32">
+                            <button class="no-print text-[10px] text-red-500 hover:text-red-700 underline font-medium mt-1" onclick="window.removeImage('${item.id}')">Quitar</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Cargar datos en la UI cuando Firebase responde
+        function updateDOM(id, data) {
+            const statusEl = document.getElementById(`status-${id}`);
+            if (statusEl && statusEl.value !== data.status) statusEl.value = data.status || 'publicado_igual';
+
+            const postEl = document.getElementById(`post-${id}`);
+            // No sobreescribir si el usuario está escribiendo justo en este campo
+            if (postEl && document.activeElement !== postEl) {
+                postEl.value = data.post || '';
+                window.autoResize(postEl);
+            }
+
+            const reasonEl = document.getElementById(`reason-${id}`);
+            if (reasonEl && document.activeElement !== reasonEl) {
+                reasonEl.value = data.reason || '';
+                window.autoResize(reasonEl);
+            }
+
+            const imgEl = document.getElementById(`preview-${id}`);
+            const containerEl = document.getElementById(`preview-container-${id}`);
+            if (data.image) {
+                if(imgEl) imgEl.src = data.image;
+                if(containerEl) containerEl.classList.remove('hidden');
+            } else {
+                if(imgEl) imgEl.src = '';
+                if(containerEl) containerEl.classList.add('hidden');
+            }
+        }
+
+        function loadDataFromFirestore() {
+            if (!currentUserId) return;
+            
+            // Construir HTML Estático Base
+            const tbodyAbril = document.getElementById('abril-tbody');
+            const tbodyMarzo = document.getElementById('marzo-tbody');
+            
+            if(tbodyAbril.innerHTML.trim() === "") {
+                abrilData.forEach(item => tbodyAbril.innerHTML += generateRowAbril(item));
+                marzoData.forEach(item => tbodyMarzo.innerHTML += generateRowMarzo(item));
+            }
+
+            const postsRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'posts');
+            unsubscribeSnapshot = onSnapshot(postsRef, (snapshot) => {
+                document.getElementById('loading-indicator').classList.add('hidden');
+                document.getElementById('tables-container').classList.remove('hidden');
+
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added" || change.type === "modified") {
+                        updateDOM(change.doc.id, change.doc.data());
+                    }
+                });
+            }, (error) => {
+                console.error("Error cargando datos de Firestore:", error);
+            });
+        }
+
+        // Listener Global de Autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('app-view').classList.remove('hidden');
+                
+                // Resetear botón de login por si cierra sesión después
+                const btn = document.getElementById('btn-login');
+                btn.disabled = false;
+                btn.innerText = "Ingresar";
+
+                loadDataFromFirestore();
+            } else {
+                currentUserId = null;
+                document.getElementById('login-view').classList.remove('hidden');
+                document.getElementById('app-view').classList.add('hidden');
+                document.getElementById('tables-container').classList.add('hidden');
+                document.getElementById('loading-indicator').classList.remove('hidden');
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
+            }
+        });
+
+    </script>
+</body>
+</html>
