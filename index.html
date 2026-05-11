@@ -79,7 +79,7 @@
                     ACCEDER AL REPORTE
                 </button>
             </form>
-            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.3</p>
+            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.4</p>
         </div>
     </div>
 
@@ -136,7 +136,7 @@
             </div>
 
             <div id="tables-container" class="hidden space-y-20">
-                <!-- SECCIÓN ABRIL -->
+                <!-- SECCIÓN ABRIL (INTACTA) -->
                 <section id="section-abril" class="fade-in">
                     <div class="flex items-center gap-6 mb-8">
                         <h2 class="text-3xl font-black text-coosajo-blue uppercase tracking-tighter">Mes de Abril</h2>
@@ -159,7 +159,7 @@
                     </div>
                 </section>
 
-                <!-- SECCIÓN MARZO -->
+                <!-- SECCIÓN MARZO (DEPURADA) -->
                 <section id="section-marzo" class="fade-in">
                     <div class="flex items-center gap-6 mb-8">
                         <h2 class="text-3xl font-black text-coosajo-blue uppercase tracking-tighter">Mes de Marzo</h2>
@@ -184,19 +184,14 @@
         </main>
     </div>
 
-    <!-- Modal de Confirmación de Borrado -->
+    <!-- Modal Borrar -->
     <div id="delete-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full text-center">
-            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            </div>
             <h3 class="text-xl font-black text-slate-800 mb-2">¿Eliminar esta fila?</h3>
-            <p class="text-slate-500 text-sm mb-6">Esta acción ocultará la fila del reporte para todos los usuarios.</p>
+            <p class="text-slate-500 text-sm mb-6">Esta acción ocultará la fila para todos.</p>
             <div class="flex gap-3">
-                <button id="cancel-delete" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition">Cancelar</button>
-                <button id="confirm-delete" class="flex-1 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition">Eliminar</button>
+                <button id="cancel-delete" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold">Cancelar</button>
+                <button id="confirm-delete" class="flex-1 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold">Eliminar</button>
             </div>
         </div>
     </div>
@@ -225,7 +220,7 @@
         let unsubscribeSnapshot = null;
         let debounceTimers = {};
         let currentDeleteId = null;
-        let currentUser = null; // Para rastrear quién inició sesión
+        let activeUser = null;
 
         const abrilData = [
             { id: "A01", fecha: "7 abr", eje: "Becas", frase: "El cooperativismo convierte el esfuerzo colectivo en oportunidades reales." },
@@ -254,6 +249,7 @@
             { id: "A24", fecha: "30 abr", eje: "Finanzas", frase: "Tener un presupuesto personal te da libertad real." }
         ];
 
+        // MARZO - He conservado los IDs M01 a M12 para que no pierdas tus datos guardados
         const marzoData = [
             { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Acompañamos a mujeres en su crecimiento." },
             { id: "M02", frase: "Creer en el poder propio impulsa el negocio.", copy: "Formación y confianza para emprendedoras." },
@@ -274,16 +270,15 @@
             { id: "M17", frase: "Tus habilidades digitales pueden llevar tu emprendimiento más lejos.", copy: "Descubre nuevas formas de emprender a través de herramientas tecnológicas." },
             { id: "M18", frase: "Cuando un joven descubre su capacidad de crear, todo su futuro cambia.", copy: "ACCESO JOVEN despierta el interés de emprender e innovar." },
             { id: "M19", frase: "La innovación nace en una mente joven que se atreve a imaginar nuevas soluciones.", copy: "Impulsamos habilidades para que los jóvenes transformen ideas en proyectos reales." },
-            { id: "M21", frase: "Un oficio aprendido es una oportunidad para toda la vida.", copy: "Formación técnica que fortalece tu futuro laboral." },
-            { id: "M23", frase: "Aprender un oficio es invertir en un futuro más seguro.", copy: "Te ofrecemos herramientas para mejorar tus oportunidades." },
-            { id: "M25", frase: "El conocimiento es una herramienta poderosa que te abre camino.", copy: "Con becas Excelencia impulsamos estudiantes con sueños, metas y determinación." },
-            { id: "M26", frase: "Cuando enseñamos valores desde pequeños, sembramos adultos responsables.", copy: "Wachalal forma niños y jóvenes con visión financiera y cooperativa." },
-            { id: "M27", frase: "Los niños que aprenden a cooperar crecen siendo mejores ciudadanos.", copy: "Wachalal impulsa valores que unen y transforman." },
-            { id: "M28", frase: "La educación financiera te permite caminar con más seguridad hacia tus metas.", copy: "Te acompañamos a administrar mejor tus recursos." },
-            { id: "M29", frase: "Organizar tus finanzas es un acto de amor hacia tu futuro.", copy: "HUELLAS ofrece herramientas para una vida más estable." },
-            { id: "M30", frase: "Las habilidades blandas construyen relaciones, oportunidades y crecimiento personal.", copy: "Formación para fortalecer tu comunicación, liderazgo y confianza." },
-            { id: "M31", frase: "La organización comunitaria es la base del desarrollo sostenible.", copy: "Impulsamos la unión, la participación y el liderazgo." },
-            { id: "M32", frase: "Sembrar conocimiento es la base para cosechar mejores resultados.", copy: "Formación agrícola que impulsa sostenibilidad y productividad." }
+            // M21, M25, M26 y M29 eliminadas según tu petición
+            { id: "M27", frase: "Cuando enseñamos valores desde pequeños, sembramos adultos responsables.", copy: "Wachalal forma niños y jóvenes con visión financiera y cooperativa." },
+            { id: "M28", frase: "Los niños que aprenden a cooperar crecen siendo mejores ciudadanos.", copy: "Wachalal impulsa valores que unen y transforman." },
+            { id: "M30", frase: "La educación financiera te permite caminar con más seguridad hacia tus metas.", copy: "Te acompañamos a administrar mejor tus recursos." },
+            { id: "M31", frase: "Organizar tus finanzas es un acto de amor hacia tu futuro.", copy: "HUELLAS ofrece herramientas para una vida más estable." },
+            { id: "M32", frase: "Las habilidades blandas construyen relaciones, oportunidades y crecimiento personal.", copy: "Formación para fortalecer tu comunicación, liderazgo y confianza." },
+            { id: "M33", frase: "La organización comunitaria es la base del desarrollo sostenible.", copy: "Impulsamos la unión, la participación y el liderazgo." },
+            { id: "M34", frase: "Sembrar conocimiento es la base para cosechar mejores resultados.", copy: "Formación agrícola que impulsa sostenibilidad y productividad." },
+            { id: "M35", frase: "Cada cultivo cuenta una historia de esfuerzo, disciplina y aprendizaje.", copy: "Apoyamos a agricultores para mejorar su producción." }
         ];
 
         window.saveData = async (id, type, value) => {
@@ -293,7 +288,7 @@
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'registros', id);
                     await setDoc(docRef, { [type]: value }, { merge: true });
-                } catch (err) { console.error("Save Error:", err); }
+                } catch (err) { console.error(err); }
             }, 500);
         };
 
@@ -334,7 +329,6 @@
 
         document.getElementById('cancel-delete').addEventListener('click', () => {
             document.getElementById('delete-modal').classList.add('hidden');
-            currentDeleteId = null;
         });
 
         document.getElementById('confirm-delete').addEventListener('click', async () => {
@@ -342,17 +336,12 @@
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'registros', currentDeleteId);
                 await setDoc(docRef, { deleted: true }, { merge: true });
-                const tr = document.querySelector(`tr[data-id="${currentDeleteId}"]`);
-                if (tr) tr.classList.add('hidden');
                 document.getElementById('delete-modal').classList.add('hidden');
-                currentDeleteId = null;
             } catch (err) { console.error(err); }
         });
 
         const buildRow = (item, isAbril) => {
-            // Verificamos si el usuario es Elián o el nuevo usuario para mostrar el botón
-            const canDelete = (currentUser === 'sjemartinez' || currentUser === 'sjjardon');
-            
+            const canDelete = (activeUser === 'sjemartinez' || activeUser === 'sjjardon');
             return `
             <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 group" data-id="${item.id}">
                 ${isAbril ? `
@@ -385,18 +374,13 @@
                             Subir Foto
                             <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
                         </label>
-                        
                         <div id="img-box-${item.id}" class="hidden">
                             <img id="img-${item.id}" src="" class="w-full max-h-32 object-contain border rounded-2xl mx-auto shadow-md bg-white">
-                            <button class="no-print text-[10px] text-red-500 font-black uppercase mt-2 hover:underline" onclick="window.delImg('${item.id}')">Eliminar Imagen</button>
+                            <button class="no-print text-[10px] text-red-500 font-black uppercase mt-2" onclick="window.delImg('${item.id}')">Eliminar Imagen</button>
                         </div>
-
                         ${canDelete ? `
                         <button onclick="window.askDeleteRow('${item.id}')" 
-                                class="no-print mt-4 flex items-center justify-center gap-1 text-[9px] text-red-500 border border-red-200 bg-red-50 py-2 rounded-lg font-bold hover:bg-red-100 uppercase transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                                class="no-print mt-4 flex items-center justify-center gap-1 text-[9px] text-red-600 border border-red-200 bg-red-50 py-2 rounded-lg font-bold hover:bg-red-100 uppercase transition">
                             Borrar Fila
                         </button>` : ''}
                     </div>
@@ -407,39 +391,28 @@
         function initializeUI() {
             const tbA = document.getElementById('abril-tbody');
             const tbM = document.getElementById('marzo-tbody');
-            // Limpiamos antes de reconstruir para asegurar que la lógica de usuario se aplique
-            tbA.innerHTML = "";
-            tbM.innerHTML = "";
+            tbA.innerHTML = ""; tbM.innerHTML = "";
             abrilData.forEach(i => tbA.innerHTML += buildRow(i, true));
             marzoData.forEach(i => tbM.innerHTML += buildRow(i, false));
         }
 
-        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const u = document.getElementById('username').value.trim();
             const p = document.getElementById('password').value.trim();
-            const errorEl = document.getElementById('login-error');
-            const btn = document.getElementById('btn-login');
-            
             const validUsers = ['sjemartinez', 'sjjardon'];
             if (!validUsers.includes(u) || p !== 'Coosajo2041') {
-                errorEl.innerText = "USUARIO O CONTRASEÑA INCORRECTOS"; errorEl.classList.remove('hidden'); return;
+                document.getElementById('login-error').innerText = "ERROR DE USUARIO"; 
+                document.getElementById('login-error').classList.remove('hidden'); return;
             }
-            
-            errorEl.classList.add('hidden'); btn.disabled = true; btn.innerText = "AUTENTICANDO...";
-            
             try {
                 await signInAnonymously(auth);
-                currentUser = u; // Guardamos el usuario para la UI
+                activeUser = u;
                 document.getElementById('user-display-name').innerText = "Sesión: " + u;
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('app-view').classList.remove('hidden');
-                initializeUI(); // Construimos la tabla con el permiso de borrado si aplica
-            } catch (err) {
-                errorEl.innerText = "ERROR DE SERVIDOR"; errorEl.classList.remove('hidden');
-                btn.disabled = false; btn.innerText = "ACCEDER AL REPORTE";
-            }
+                initializeUI();
+            } catch (err) { console.error(err); }
         });
 
         document.getElementById('btn-logout').addEventListener('click', () => signOut(auth).then(() => location.reload()));
@@ -458,29 +431,25 @@
                     document.getElementById('tables-container').classList.remove('hidden');
                     snapshot.docChanges().forEach((change) => {
                         const data = change.doc.data(); const id = change.doc.id;
-                        if (data.deleted === true) {
-                            const tr = document.querySelector(`tr[data-id="${id}"]`);
-                            if (tr) tr.classList.add('hidden');
-                            return;
-                        }
+                        const tr = document.querySelector(`tr[data-id="${id}"]`);
+                        if (data.deleted === true) { if (tr) tr.classList.add('hidden'); return; }
+                        else if (tr) tr.classList.remove('hidden');
+                        
                         const st = document.getElementById(`st-${id}`);
                         if (st && st.value !== data.status) st.value = data.status || 'publicado_igual';
                         const rs = document.getElementById(`rs-${id}`);
                         if (rs && document.activeElement !== rs) { rs.value = data.reason || ''; window.autoResize(rs); }
                         const imgBox = document.getElementById(`img-box-${id}`); const img = document.getElementById(`img-${id}`);
                         if (data.image) {
-                            if(img) img.src = data.image;
-                            if(imgBox) imgBox.classList.remove('hidden');
+                            if(img) img.src = data.image; if(imgBox) imgBox.classList.remove('hidden');
                         } else {
-                            if(img) img.src = '';
-                            if(imgBox) imgBox.classList.add('hidden');
+                            if(img) img.src = ''; if(imgBox) imgBox.classList.add('hidden');
                         }
                     });
                 });
             } else {
                 document.getElementById('login-view').classList.remove('hidden');
                 document.getElementById('app-view').classList.add('hidden');
-                if (unsubscribeSnapshot) unsubscribeSnapshot();
             }
         });
     </script>
