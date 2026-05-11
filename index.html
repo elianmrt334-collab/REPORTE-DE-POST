@@ -79,7 +79,7 @@
                     ACCEDER AL REPORTE
                 </button>
             </form>
-            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v3.2</p>
+            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v3.3</p>
         </div>
     </div>
 
@@ -132,7 +132,7 @@
                         <div class="h-8 w-8 bg-coosajo-blue rounded-lg animate-pulse"></div>
                     </div>
                 </div>
-                <p class="mt-8 text-coosajo-blue font-black text-2xl tracking-tighter">Sincronizando con la Nube...</p>
+                <p class="mt-8 text-coosajo-blue font-black text-2xl tracking-tighter">Sincronizando Base de Datos...</p>
                 <div id="error-db-msg" class="hidden mt-6 text-red-500 font-bold bg-red-50 p-4 rounded-xl max-w-sm mx-auto border border-red-100"></div>
             </div>
 
@@ -149,10 +149,9 @@
                                 <tr>
                                     <th class="p-5 w-24">Fecha</th>
                                     <th class="p-5 w-32">Eje Social</th>
-                                    <th class="p-5 w-52">Frase Propuesta</th>
+                                    <th class="p-5 w-60">Frase Propuesta</th>
                                     <th class="p-5 w-44">Estado</th>
-                                    <th class="p-5 min-w-[260px]">Copy Final Publicado</th>
-                                    <th class="p-5 min-w-[200px]">Justificación</th>
+                                    <th class="p-5 min-w-[280px]">Justificación / Comentario</th>
                                     <th class="p-5 w-44">Evidencia</th>
                                 </tr>
                             </thead>
@@ -171,11 +170,10 @@
                         <table class="min-w-full text-left text-sm">
                             <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-[0.15em] font-black">
                                 <tr>
-                                    <th class="p-5 w-52">Frase Original</th>
-                                    <th class="p-5 w-52">Copy de Referencia</th>
+                                    <th class="p-5 w-60">Frase Original</th>
+                                    <th class="p-5 w-60">Copy de Referencia</th>
                                     <th class="p-5 w-44">Estado</th>
-                                    <th class="p-5 min-w-[260px]">Copy Final Publicado</th>
-                                    <th class="p-5 min-w-[200px]">Justificación</th>
+                                    <th class="p-5 min-w-[280px]">Justificación / Comentario</th>
                                     <th class="p-5 w-44">Evidencia</th>
                                 </tr>
                             </thead>
@@ -322,13 +320,7 @@
                 </td>
 
                 <td class="p-5 border-r align-top">
-                    <textarea id="pt-${item.id}" rows="2" placeholder="Pegar copy final..."
-                        oninput="window.autoResize(this); window.saveData('${item.id}', 'post', this.value)"
-                        class="w-full bg-slate-50 border border-slate-200 p-4 text-xs rounded-2xl focus:ring-2 focus:ring-coosajo-blue font-medium"></textarea>
-                </td>
-
-                <td class="p-5 border-r align-top">
-                    <textarea id="rs-${item.id}" rows="2" placeholder="Justificación del cambio..."
+                    <textarea id="rs-${item.id}" rows="2" placeholder="Explicación o justificante..."
                         oninput="window.autoResize(this); window.saveData('${item.id}', 'reason', this.value)"
                         class="w-full bg-slate-50 border border-slate-200 p-4 text-xs rounded-2xl focus:ring-2 focus:ring-coosajo-green font-medium"></textarea>
                 </td>
@@ -407,9 +399,6 @@
                         
                         const st = document.getElementById(`st-${id}`);
                         if (st && st.value !== data.status) st.value = data.status || 'publicado_igual';
-
-                        const pt = document.getElementById(`pt-${id}`);
-                        if (pt && document.activeElement !== pt) { pt.value = data.post || ''; window.autoResize(pt); }
 
                         const rs = document.getElementById(`rs-${id}`);
                         if (rs && document.activeElement !== rs) { rs.value = data.reason || ''; window.autoResize(rs); }
