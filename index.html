@@ -181,14 +181,15 @@
 
     <!-- Scripts Data y Firebase Module -->
     <script type="module">
+        // Importaciones compatibles con navegador (CDN) basadas en la configuración proporcionada
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
         // 1. CONFIGURACIÓN FIREBASE Y DATOS
         // ==========================================
-        // Forzamos usar tu Firebase SIEMPRE (incluso en la previsualización)
         const firebaseConfig = {
             apiKey: "AIzaSyACfn6C6_XqLDQI29f6uHUUwlCQkSCXNYk",
             authDomain: "costos-comunicacion-digital.firebaseapp.com",
@@ -196,10 +197,13 @@
             projectId: "costos-comunicacion-digital",
             storageBucket: "costos-comunicacion-digital.firebasestorage.app",
             messagingSenderId: "299496606379",
-            appId: "1:299496606379:web:a4d6609ff79eebff0c85ee"
+            appId: "1:299496606379:web:a4d6609ff79eebff0c85ee",
+            measurementId: "G-D7GGDWSWKY"
         };
 
+        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
