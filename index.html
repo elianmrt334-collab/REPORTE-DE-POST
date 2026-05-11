@@ -11,9 +11,9 @@
                 extend: {
                     colors: {
                         coosajo: {
-                            blue: '#172e59',  /* Azul principal */
-                            green: '#158e45', /* Verde secundario */
-                            light: '#F0F6FF'  /* Blanco/Azul super claro */
+                            blue: '#172e59',  /* Azul exacto solicitado */
+                            green: '#158e45', /* Verde exacto solicitado */
+                            light: '#f4f7f9'  /* Fondo tenue para cajas de texto */
                         }
                     }
                 }
@@ -26,18 +26,21 @@
             .no-print { display: none !important; }
             #login-view { display: none !important; }
             #app-view { display: block !important; }
-            /* Ajustes para tabla en impresión */
+            
+            /* Ajustes estrictos de impresión para las tablas */
+            .table-container { box-shadow: none !important; border: none !important; }
             table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #d1d5db !important; padding: 8px !important; }
-            th { background-color: #0047BA !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th, td { border: 1px solid #d1d5db !important; padding: 6px !important; }
+            th { background-color: #172e59 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             tr { page-break-inside: avoid; }
+            
+            /* Inputs limpios para PDF */
             textarea {
                 border: none !important;
                 resize: none !important;
                 background-color: transparent !important;
                 box-shadow: none !important;
                 overflow: hidden;
-                min-height: 20px;
                 padding: 0 !important;
                 width: 100%;
                 font-family: inherit;
@@ -50,13 +53,13 @@
                 color: black !important;
                 padding: 0 !important;
             }
-            img { page-break-inside: avoid; max-height: 150px !important; }
+            img { page-break-inside: avoid; max-height: 120px !important; }
+            .bg-coosajo-light { background-color: transparent !important; }
         }
-        textarea {
-            transition: border-color 0.2s;
-        }
+        
+        textarea { transition: border-color 0.2s; overflow: hidden; }
         .table-container { overflow-x: auto; }
-        th { top: 0; position: sticky; z-index: 10; }
+        th { position: sticky; top: 0; z-index: 10; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
@@ -65,116 +68,113 @@
     <div id="login-view" class="fixed inset-0 bg-coosajo-blue flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md mx-4">
             <div class="text-center mb-8">
-                <img src="logo coosajo baja resolución.png" alt="Logo Coosajo" class="h-20 mx-auto mb-4 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x80/ffffff/0047BA?text=COOSAJO';">
-                <h2 class="text-2xl font-extrabold text-gray-800">Acceso al Sistema</h2>
-                <p class="text-sm text-gray-500 mt-1">Reportes de Vinculación Social</p>
+                <!-- Se llama al logo exactamente con el nombre solicitado -->
+                <img src="logo coosajo baja resolución.png" alt="Logo Coosajo" class="h-20 mx-auto mb-4 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x80/ffffff/172e59?text=COOSAJO';">
+                <h2 class="text-2xl font-extrabold text-gray-800">Acceso al Reporte</h2>
+                <p class="text-sm text-gray-500 mt-1">Vinculación Social</p>
             </div>
-            <form onsubmit="window.handleLogin(event)" class="space-y-6">
+            <form id="login-form" class="space-y-6">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Usuario</label>
-                    <input type="text" id="username" class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-2 focus:ring-coosajo-blue focus:outline-none" placeholder="Ej: sjemartinez" autocomplete="username">
+                    <input type="text" id="username" value="sjemartinez" class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-2 focus:ring-coosajo-blue focus:outline-none" placeholder="Ej: sjemartinez" autocomplete="username">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
-                    <input type="password" id="password" class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-2 focus:ring-coosajo-blue focus:outline-none" placeholder="••••••••" autocomplete="current-password">
+                    <input type="password" id="password" value="Coosajo2041" class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-2 focus:ring-coosajo-blue focus:outline-none" placeholder="••••••••" autocomplete="current-password">
                 </div>
                 <div id="login-error" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200 font-medium"></div>
                 <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition shadow-md">Ingresar</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Conectado a Firebase Database</p>
+            <p class="text-xs text-center text-gray-400 mt-6 font-mono">Conectado a Firebase Database</p>
         </div>
     </div>
 
-    <!-- Contenido Principal (Oculto hasta hacer login) -->
+    <!-- Aplicación Principal (Oculta hasta el login) -->
     <div id="app-view" class="hidden min-h-screen flex flex-col">
-        <!-- Header / Navbar -->
-        <header class="bg-coosajo-blue text-white shadow-lg print:shadow-none print:bg-transparent print:text-black print:border-b print:border-gray-300">
+        <!-- Barra de Navegación -->
+        <header class="bg-coosajo-blue text-white shadow-md print:shadow-none print:bg-transparent print:text-black">
             <div class="max-w-[1400px] mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
                 <div class="flex items-center mb-4 md:mb-0">
-                    <img src="logo coosajo baja resolución.png" alt="Logo Coosajo" class="h-12 w-auto bg-white p-1 rounded" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x60/ffffff/0047BA?text=COOSAJO';">
+                    <img src="logo coosajo baja resolución.png" alt="Logo Coosajo" class="h-12 w-auto bg-white p-1 rounded" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x60/ffffff/172e59?text=COOSAJO';">
                     <div class="ml-4">
                         <h1 class="text-xl font-bold">Reporte de Publicaciones</h1>
-                        <p class="text-green-300 font-semibold text-sm print:text-gray-600">Vinculación Social</p>
+                        <p class="text-coosajo-green font-semibold text-sm print:text-gray-600">Vinculación Social</p>
                     </div>
                 </div>
-                <div class="no-print flex flex-wrap gap-3 items-center mt-4 md:mt-0">
-                    <div class="text-sm font-medium mr-2 bg-blue-800 px-3 py-1 rounded">👤 <span id="user-display">sjemartinez</span></div>
-                    <!-- Filtro de meses -->
-                    <div class="flex items-center bg-white rounded shadow px-3 py-1.5 border border-gray-200">
+                <div class="no-print flex flex-wrap gap-3 items-center">
+                    <div class="text-sm font-medium border border-blue-400 bg-blue-800/30 px-3 py-1.5 rounded">👤 <span id="user-display">sjemartinez</span></div>
+                    
+                    <!-- Filtro por mes -->
+                    <div class="flex items-center bg-white rounded shadow-sm px-3 py-1.5">
                         <label for="monthFilter" class="text-sm font-bold text-coosajo-blue mr-2">Filtrar:</label>
-                        <select id="monthFilter" onchange="window.filterMonths()" class="text-sm text-gray-700 focus:outline-none cursor-pointer bg-transparent">
-                            <option value="todos">Todos los meses</option>
+                        <select id="monthFilter" class="text-sm text-gray-700 focus:outline-none cursor-pointer bg-transparent">
+                            <option value="todos">Ambos Meses</option>
                             <option value="abril">Solo Abril</option>
                             <option value="marzo">Solo Marzo</option>
                         </select>
                     </div>
                     
-                    <button onclick="window.handleLogout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition text-sm font-medium">
-                        Cerrar Sesión
-                    </button>
-                    <button onclick="window.print()" class="bg-coosajo-green hover:bg-green-700 text-white px-4 py-2 rounded shadow transition text-sm font-bold flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    <button id="btn-export" class="bg-coosajo-green hover:bg-green-700 text-white px-4 py-2 rounded shadow transition text-sm font-bold flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                         Exportar PDF
+                    </button>
+                    <button id="btn-logout" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded shadow transition text-sm font-bold">
+                        Salir
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="max-w-[1400px] mx-auto px-4 py-8 sm:px-6 lg:px-8 flex-1 w-full">
             
-            <div id="loading-indicator" class="text-center py-10">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-coosajo-blue"></div>
-                <p class="mt-2 text-gray-500 font-medium text-sm">Sincronizando con Firebase...</p>
+            <div id="loading-indicator" class="text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-4 border-coosajo-green"></div>
+                <p class="mt-4 text-coosajo-blue font-bold">Sincronizando con la base de datos...</p>
             </div>
 
             <div id="tables-container" class="hidden">
-                <!-- Sección ABRIL -->
+                
+                <!-- ABRIL -->
                 <section id="section-abril" class="mb-12">
-                    <h2 class="text-2xl font-extrabold text-coosajo-blue border-b-4 border-coosajo-green inline-block mb-4 pb-1">Reporte Abril</h2>
-                    
-                    <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 table-container">
+                    <h2 class="text-2xl font-extrabold text-coosajo-blue border-b-4 border-coosajo-green inline-block mb-4 pb-1">Reporte: Abril</h2>
+                    <div class="bg-white shadow-md rounded-lg border border-gray-200 table-container">
                         <table class="min-w-full text-left text-sm whitespace-normal">
                             <thead class="bg-coosajo-blue text-white print:text-black print:bg-gray-200">
                                 <tr>
                                     <th class="p-3 w-24">Fecha</th>
                                     <th class="p-3 w-32">Eje</th>
                                     <th class="p-3 w-48">Frase Original</th>
-                                    <th class="p-3 w-40">Estado del Post</th>
-                                    <th class="p-3 min-w-[200px]">Post Publicado (Final)</th>
-                                    <th class="p-3 min-w-[200px]">Motivo de Modificación</th>
-                                    <th class="p-3 w-48">Imagen</th>
+                                    <th class="p-3 w-40">Estado</th>
+                                    <th class="p-3 min-w-[200px]">Post Publicado</th>
+                                    <th class="p-3 min-w-[200px]">Motivo</th>
+                                    <th class="p-3 w-40">Imagen</th>
                                 </tr>
                             </thead>
-                            <tbody id="abril-tbody" class="divide-y divide-gray-200">
-                                <!-- Contenido JS -->
-                            </tbody>
+                            <tbody id="abril-tbody" class="divide-y divide-gray-200"></tbody>
                         </table>
                     </div>
                 </section>
 
-                <!-- Sección MARZO -->
+                <!-- MARZO -->
                 <section id="section-marzo" class="mb-12">
-                    <h2 class="text-2xl font-extrabold text-coosajo-blue border-b-4 border-coosajo-green inline-block mb-4 pb-1">Reporte Marzo</h2>
-                    
-                    <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 table-container">
+                    <h2 class="text-2xl font-extrabold text-coosajo-blue border-b-4 border-coosajo-green inline-block mb-4 pb-1">Reporte: Marzo</h2>
+                    <div class="bg-white shadow-md rounded-lg border border-gray-200 table-container">
                         <table class="min-w-full text-left text-sm whitespace-normal">
                             <thead class="bg-coosajo-blue text-white print:text-black print:bg-gray-200">
                                 <tr>
                                     <th class="p-3 w-48">Frase Original</th>
                                     <th class="p-3 w-48">Copy Original</th>
-                                    <th class="p-3 w-40">Estado del Post</th>
-                                    <th class="p-3 min-w-[200px]">Post Publicado (Final)</th>
-                                    <th class="p-3 min-w-[200px]">Motivo de Modificación</th>
-                                    <th class="p-3 w-48">Imagen</th>
+                                    <th class="p-3 w-40">Estado</th>
+                                    <th class="p-3 min-w-[200px]">Post Publicado</th>
+                                    <th class="p-3 min-w-[200px]">Motivo</th>
+                                    <th class="p-3 w-40">Imagen</th>
                                 </tr>
                             </thead>
-                            <tbody id="marzo-tbody" class="divide-y divide-gray-200">
-                                <!-- Contenido JS -->
-                            </tbody>
+                            <tbody id="marzo-tbody" class="divide-y divide-gray-200"></tbody>
                         </table>
                     </div>
                 </section>
+
             </div>
         </main>
     </div>
@@ -182,38 +182,22 @@
     <!-- Scripts Data y Firebase Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGURACIÓN FIREBASE (PARA TU GITHUB)
+        // 1. CONFIGURACIÓN FIREBASE Y DATOS
         // ==========================================
-        // Este bloque ya contiene tus credenciales reales proporcionadas.
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyACfn6C6_XqLDQI29f6uHUUwlCQkSCXNYk",
-  authDomain: "costos-comunicacion-digital.firebaseapp.com",
-  databaseURL: "https://costos-comunicacion-digital-default-rtdb.firebaseio.com",
-  projectId: "costos-comunicacion-digital",
-  storageBucket: "costos-comunicacion-digital.firebasestorage.app",
-  messagingSenderId: "299496606379",
-  appId: "1:299496606379:web:a4d6609ff79eebff0c85ee",
-  measurementId: "G-D7GGDWSWKY"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+        const miFirebaseConfig = {
+            apiKey: "AIzaSyACfn6C6_XqLDQI29f6uHUUwlCQkSCXNYk",
+            authDomain: "costos-comunicacion-digital.firebaseapp.com",
+            databaseURL: "https://costos-comunicacion-digital-default-rtdb.firebaseio.com",
+            projectId: "costos-comunicacion-digital",
+            storageBucket: "costos-comunicacion-digital.firebasestorage.app",
+            messagingSenderId: "299496606379",
+            appId: "1:299496606379:web:a4d6609ff79eebff0c85ee"
         };
 
-        // Lógica automática para detectar si está en previsualización o ya en tu sitio
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : miFirebaseConfig;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'coosajo-reportes';
         
@@ -225,7 +209,7 @@ const analytics = getAnalytics(app);
         let unsubscribeSnapshot = null;
         let debounceTimers = {};
 
-        // Datos Originales Extraídos
+        // Bases de datos extraídas de los Word
         const abrilData = [
             { id: "A01", fecha: "7 de abril", eje: "Programas de becas", frase: "El cooperativismo convierte el esfuerzo colectivo en oportunidades reales." },
             { id: "A02", fecha: "8 de abril", eje: "Educación financiera", frase: "En el cooperativismo, un asociado informado es un asociado empoderado." },
@@ -317,123 +301,36 @@ const analytics = getAnalytics(app);
         ];
 
         // ==========================================
-        // FUNCIONES GLOBALES DE UI Y BASE DE DATOS
+        // 2. SISTEMA DE LOGIN Y AUTENTICACIÓN
         // ==========================================
-        
-        window.saveToFirebase = (id, type, value) => {
-            if (!currentUserId) return;
-            // Debounce para no saturar firebase con cada tecla
-            clearTimeout(debounceTimers[`${id}_${type}`]);
-            debounceTimers[`${id}_${type}`] = setTimeout(() => {
-                const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'posts', id);
-                setDoc(docRef, { [type]: value }, { merge: true })
-                    .catch(err => console.error("Error guardando datos:", err));
-            }, 800);
-        };
-
-        // Autoajuste de cajas de texto
-        window.autoResize = (el) => {
-            if(!el) return;
-            el.style.height = 'auto';
-            el.style.height = (el.scrollHeight) + 'px';
-        };
-
-        window.handleImageUpload = (event, id) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 600;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
-                    window.saveToFirebase(id, 'image', dataUrl);
-                    
-                    // Actualizar UI Local inmediato
-                    document.getElementById(`preview-${id}`).src = dataUrl;
-                    document.getElementById(`preview-container-${id}`).classList.remove('hidden');
-                }
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        };
-
-        window.removeImage = (id) => {
-            window.saveToFirebase(id, 'image', null);
-            document.getElementById(`preview-${id}`).src = "";
-            document.getElementById(`preview-container-${id}`).classList.add('hidden');
-            const fileInput = document.querySelector(`input[onchange*="'${id}'"]`);
-            if(fileInput) fileInput.value = "";
-        };
-
-        window.filterMonths = () => {
-            const filterValue = document.getElementById('monthFilter').value;
-            const secAbril = document.getElementById('section-abril');
-            const secMarzo = document.getElementById('section-marzo');
-
-            if (filterValue === 'todos') {
-                secAbril.style.display = 'block';
-                secMarzo.style.display = 'block';
-            } else if (filterValue === 'abril') {
-                secAbril.style.display = 'block';
-                secMarzo.style.display = 'none';
-            } else if (filterValue === 'marzo') {
-                secAbril.style.display = 'none';
-                secMarzo.style.display = 'block';
-            }
-        };
-
-        // ==========================================
-        // SISTEMA DE LOGIN (EXCLUSIVO SJEMARTINEZ)
-        // ==========================================
-        window.handleLogin = async (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const userVal = document.getElementById('username').value.trim().toLowerCase();
+            const userVal = document.getElementById('username').value.trim();
             const passVal = document.getElementById('password').value.trim();
             const errorEl = document.getElementById('login-error');
             const btn = document.getElementById('btn-login');
             
             errorEl.classList.add('hidden');
 
-            if (userVal !== 'sjemartinez') {
-                errorEl.innerText = "Acceso denegado: Solo el usuario 'sjemartinez' está autorizado para este reporte.";
-                errorEl.classList.remove('hidden');
-                return;
-            }
-            if (passVal !== 'Coosajo2041') {
-                errorEl.innerText = "Contraseña incorrecta.";
+            if (userVal !== 'sjemartinez' || passVal !== 'Coosajo2041') {
+                errorEl.innerText = "Usuario o contraseña incorrectos.";
                 errorEl.classList.remove('hidden');
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "Ingresando...";
+            btn.innerText = "Conectando...";
 
             try {
-                // Si estamos en entorno inmersivo usamos el token especial, sino el autenticador normal
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    // Entorno de Preview
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
-                    const email = "sjemartinez@coosajo.com"; // Mapeo automático
+                    // Entorno de Producción (GitHub)
+                    const email = "sjemartinez@coosajo.com";
                     try {
                         await signInWithEmailAndPassword(auth, email, passVal);
                     } catch (err) {
-                        // Si no existe, lo crea automáticamente la primera vez en tu Firebase
                         if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
                             await createUserWithEmailAndPassword(auth, email, passVal);
                         } else {
@@ -442,195 +339,185 @@ const analytics = getAnalytics(app);
                     }
                 }
             } catch (error) {
-                errorEl.innerText = "Error al iniciar sesión: Verifica tus credenciales.";
+                console.error(error);
+                errorEl.innerText = "Error de conexión con Firebase.";
                 errorEl.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerText = "Ingresar";
             }
-        };
+        });
 
-        window.handleLogout = async () => {
+        document.getElementById('btn-logout').addEventListener('click', async () => {
             await signOut(auth);
-            location.reload(); // Recargar limpia el estado de las tablas visualmente
+            location.reload();
+        });
+
+        // ==========================================
+        // 3. LOGICA DE INTERFAZ Y AUTOGUARDADO
+        // ==========================================
+        window.saveData = (id, type, value) => {
+            if (!currentUserId) return;
+            clearTimeout(debounceTimers[`${id}_${type}`]);
+            debounceTimers[`${id}_${type}`] = setTimeout(() => {
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'posts', id);
+                setDoc(docRef, { [type]: value }, { merge: true }).catch(err => console.error(err));
+            }, 800);
         };
 
-        // ==========================================
-        // CONSTRUCCIÓN DE TABLAS Y SINCRONIZACIÓN
-        // ==========================================
-        function generateRowAbril(item) {
-            return `
-                <tr class="hover:bg-gray-50 align-top group" id="row-${item.id}">
-                    <td class="p-3 border-r border-gray-100"><strong class="text-coosajo-blue">${item.fecha}</strong></td>
-                    <td class="p-3 border-r border-gray-100 text-gray-700">${item.eje}</td>
-                    <td class="p-3 border-r border-gray-100 italic text-gray-600">"${item.frase}"</td>
+        window.autoResize = (el) => {
+            if(!el) return;
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
+        };
+
+        window.uploadImg = (event, id) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 500;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                    window.saveData(id, 'image', dataUrl);
                     
-                    <td class="p-3 border-r border-gray-100">
-                        <select id="status-${item.id}"
-                            class="w-full border border-gray-300 rounded p-1.5 text-xs bg-white focus:ring-2 focus:ring-coosajo-blue font-medium"
-                            onchange="window.saveToFirebase('${item.id}', 'status', this.value)"
-                        >
-                            <option value="publicado_igual">🔵 Igual</option>
-                            <option value="modificado">🟢 Modificado</option>
-                            <option value="no_publicado">⚪ No publicado</option>
-                        </select>
-                    </td>
-
-                    <td class="p-3 border-r border-gray-100">
-                        <textarea id="post-${item.id}" rows="2" 
-                            class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-blue bg-coosajo-light" 
-                            placeholder="Escribe el post final..."
-                            oninput="window.autoResize(this); window.saveToFirebase('${item.id}', 'post', this.value)"
-                        ></textarea>
-                    </td>
-
-                    <td class="p-3 border-r border-gray-100">
-                        <textarea id="reason-${item.id}" rows="2" 
-                            class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-green" 
-                            placeholder="Añade un motivo..."
-                            oninput="window.autoResize(this); window.saveToFirebase('${item.id}', 'reason', this.value)"
-                        ></textarea>
-                    </td>
-
-                    <td class="p-3 text-center">
-                        <div class="no-print mb-2">
-                            <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs py-1.5 px-2 rounded border border-gray-300 inline-block w-full text-center transition">
-                                <span>Subir Foto</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, '${item.id}')">
-                            </label>
-                        </div>
-                        <div id="preview-container-${item.id}" class="relative hidden">
-                            <img id="preview-${item.id}" src="" class="w-full h-auto max-h-24 object-contain rounded border border-gray-200 bg-gray-50 print:max-h-32">
-                            <button class="no-print text-[10px] text-red-500 hover:text-red-700 underline font-medium mt-1" onclick="window.removeImage('${item.id}')">Quitar</button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }
-
-        function generateRowMarzo(item) {
-            return `
-                <tr class="hover:bg-gray-50 align-top group" id="row-${item.id}">
-                    <td class="p-3 border-r border-gray-100 italic text-gray-600">"${item.frase}"</td>
-                    <td class="p-3 border-r border-gray-100 text-gray-700">${item.copy}</td>
-                    
-                    <td class="p-3 border-r border-gray-100">
-                        <select id="status-${item.id}"
-                            class="w-full border border-gray-300 rounded p-1.5 text-xs bg-white focus:ring-2 focus:ring-coosajo-blue font-medium"
-                            onchange="window.saveToFirebase('${item.id}', 'status', this.value)"
-                        >
-                            <option value="publicado_igual">🔵 Igual</option>
-                            <option value="modificado">🟢 Modificado</option>
-                            <option value="no_publicado">⚪ No publicado</option>
-                        </select>
-                    </td>
-
-                    <td class="p-3 border-r border-gray-100">
-                        <textarea id="post-${item.id}" rows="2" 
-                            class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-blue bg-coosajo-light" 
-                            placeholder="Escribe el post final..."
-                            oninput="window.autoResize(this); window.saveToFirebase('${item.id}', 'post', this.value)"
-                        ></textarea>
-                    </td>
-
-                    <td class="p-3 border-r border-gray-100">
-                        <textarea id="reason-${item.id}" rows="2" 
-                            class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-green" 
-                            placeholder="Añade un motivo..."
-                            oninput="window.autoResize(this); window.saveToFirebase('${item.id}', 'reason', this.value)"
-                        ></textarea>
-                    </td>
-
-                    <td class="p-3 text-center">
-                        <div class="no-print mb-2">
-                            <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs py-1.5 px-2 rounded border border-gray-300 inline-block w-full text-center transition">
-                                <span>Subir Foto</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, '${item.id}')">
-                            </label>
-                        </div>
-                        <div id="preview-container-${item.id}" class="relative hidden">
-                            <img id="preview-${item.id}" src="" class="w-full h-auto max-h-24 object-contain rounded border border-gray-200 bg-gray-50 print:max-h-32">
-                            <button class="no-print text-[10px] text-red-500 hover:text-red-700 underline font-medium mt-1" onclick="window.removeImage('${item.id}')">Quitar</button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }
-
-        // Cargar datos en la UI cuando Firebase responde
-        function updateDOM(id, data) {
-            const statusEl = document.getElementById(`status-${id}`);
-            if (statusEl && statusEl.value !== data.status) statusEl.value = data.status || 'publicado_igual';
-
-            const postEl = document.getElementById(`post-${id}`);
-            // No sobreescribir si el usuario está escribiendo justo en este campo
-            if (postEl && document.activeElement !== postEl) {
-                postEl.value = data.post || '';
-                window.autoResize(postEl);
+                    document.getElementById(`img-${id}`).src = dataUrl;
+                    document.getElementById(`img-box-${id}`).classList.remove('hidden');
+                }
+                img.src = e.target.result;
             }
+            reader.readAsDataURL(file);
+        };
 
-            const reasonEl = document.getElementById(`reason-${id}`);
-            if (reasonEl && document.activeElement !== reasonEl) {
-                reasonEl.value = data.reason || '';
-                window.autoResize(reasonEl);
-            }
+        window.delImg = (id) => {
+            window.saveData(id, 'image', null);
+            document.getElementById(`img-${id}`).src = "";
+            document.getElementById(`img-box-${id}`).classList.add('hidden');
+        };
 
-            const imgEl = document.getElementById(`preview-${id}`);
-            const containerEl = document.getElementById(`preview-container-${id}`);
-            if (data.image) {
-                if(imgEl) imgEl.src = data.image;
-                if(containerEl) containerEl.classList.remove('hidden');
-            } else {
-                if(imgEl) imgEl.src = '';
-                if(containerEl) containerEl.classList.add('hidden');
+        document.getElementById('monthFilter').addEventListener('change', (e) => {
+            const v = e.target.value;
+            document.getElementById('section-abril').style.display = (v === 'todos' || v === 'abril') ? 'block' : 'none';
+            document.getElementById('section-marzo').style.display = (v === 'todos' || v === 'marzo') ? 'block' : 'none';
+        });
+
+        document.getElementById('btn-export').addEventListener('click', () => window.print());
+
+        // ==========================================
+        // 4. GENERACIÓN DE TABLAS HTML
+        // ==========================================
+        const buildRow = (item, isAbril) => `
+            <tr class="hover:bg-gray-50 border-b border-gray-100 group">
+                ${isAbril ? `
+                    <td class="p-3 border-r border-gray-100 text-coosajo-blue font-bold">${item.fecha}</td>
+                    <td class="p-3 border-r border-gray-100 text-gray-700 text-xs">${item.eje}</td>
+                    <td class="p-3 border-r border-gray-100 text-gray-600 italic">"${item.frase}"</td>
+                ` : `
+                    <td class="p-3 border-r border-gray-100 text-gray-600 italic">"${item.frase}"</td>
+                    <td class="p-3 border-r border-gray-100 text-gray-700 text-xs">${item.copy}</td>
+                `}
+                
+                <td class="p-3 border-r border-gray-100 align-top">
+                    <select id="st-${item.id}" onchange="window.saveData('${item.id}', 'status', this.value)"
+                        class="w-full border border-gray-300 rounded p-1.5 text-xs focus:ring-2 focus:ring-coosajo-blue">
+                        <option value="publicado_igual">🔵 Publicado Igual</option>
+                        <option value="modificado">🟢 Modificado</option>
+                        <option value="no_publicado">⚪ No publicado</option>
+                    </select>
+                </td>
+
+                <td class="p-3 border-r border-gray-100 align-top">
+                    <textarea id="pt-${item.id}" rows="2" placeholder="Copy final publicado..."
+                        oninput="window.autoResize(this); window.saveData('${item.id}', 'post', this.value)"
+                        class="w-full bg-coosajo-light border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-blue"></textarea>
+                </td>
+
+                <td class="p-3 border-r border-gray-100 align-top">
+                    <textarea id="rs-${item.id}" rows="2" placeholder="Motivo del cambio..."
+                        oninput="window.autoResize(this); window.saveData('${item.id}', 'reason', this.value)"
+                        class="w-full border border-gray-300 p-2 text-sm rounded focus:ring-1 focus:ring-coosajo-green"></textarea>
+                </td>
+
+                <td class="p-3 align-top text-center">
+                    <label class="no-print cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs py-1.5 px-2 rounded border border-gray-300 inline-block w-full text-center transition mb-2">
+                        Subir Imagen
+                        <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
+                    </label>
+                    <div id="img-box-${item.id}" class="hidden">
+                        <img id="img-${item.id}" src="" class="w-full max-h-20 object-contain border rounded print:max-h-28 print:border-0 mx-auto">
+                        <button class="no-print text-[10px] text-red-500 hover:underline mt-1" onclick="window.delImg('${item.id}')">Quitar</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        function buildUI() {
+            const tbA = document.getElementById('abril-tbody');
+            const tbM = document.getElementById('marzo-tbody');
+            if(tbA.innerHTML.trim() === "") {
+                abrilData.forEach(item => tbA.innerHTML += buildRow(item, true));
+                marzoData.forEach(item => tbM.innerHTML += buildRow(item, false));
             }
         }
 
-        function loadDataFromFirestore() {
-            if (!currentUserId) return;
-            
-            // Construir HTML Estático Base
-            const tbodyAbril = document.getElementById('abril-tbody');
-            const tbodyMarzo = document.getElementById('marzo-tbody');
-            
-            if(tbodyAbril.innerHTML.trim() === "") {
-                abrilData.forEach(item => tbodyAbril.innerHTML += generateRowAbril(item));
-                marzoData.forEach(item => tbodyMarzo.innerHTML += generateRowMarzo(item));
-            }
-
-            const postsRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'posts');
-            unsubscribeSnapshot = onSnapshot(postsRef, (snapshot) => {
-                document.getElementById('loading-indicator').classList.add('hidden');
-                document.getElementById('tables-container').classList.remove('hidden');
-
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added" || change.type === "modified") {
-                        updateDOM(change.doc.id, change.doc.data());
-                    }
-                });
-            }, (error) => {
-                console.error("Error cargando datos de Firestore:", error);
-            });
-        }
-
-        // Listener Global de Autenticación
+        // ==========================================
+        // 5. SINCRONIZACIÓN EN TIEMPO REAL
+        // ==========================================
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // UI de Acceso
                 currentUserId = user.uid;
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('app-view').classList.remove('hidden');
                 
-                // Resetear botón de login por si cierra sesión después
-                const btn = document.getElementById('btn-login');
-                btn.disabled = false;
-                btn.innerText = "Ingresar";
+                buildUI();
 
-                loadDataFromFirestore();
+                // Conectar Listener a Firebase
+                const postsRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'posts');
+                unsubscribeSnapshot = onSnapshot(postsRef, (snapshot) => {
+                    document.getElementById('loading-indicator').classList.add('hidden');
+                    document.getElementById('tables-container').classList.remove('hidden');
+
+                    snapshot.docChanges().forEach((change) => {
+                        const data = change.doc.data();
+                        const id = change.doc.id;
+                        
+                        const st = document.getElementById(`st-${id}`);
+                        if (st && st.value !== data.status) st.value = data.status || 'publicado_igual';
+
+                        const pt = document.getElementById(`pt-${id}`);
+                        if (pt && document.activeElement !== pt) { pt.value = data.post || ''; window.autoResize(pt); }
+
+                        const rs = document.getElementById(`rs-${id}`);
+                        if (rs && document.activeElement !== rs) { rs.value = data.reason || ''; window.autoResize(rs); }
+
+                        const imgBox = document.getElementById(`img-box-${id}`);
+                        const img = document.getElementById(`img-${id}`);
+                        if (data.image) {
+                            if(img) img.src = data.image;
+                            if(imgBox) imgBox.classList.remove('hidden');
+                        } else {
+                            if(img) img.src = '';
+                            if(imgBox) imgBox.classList.add('hidden');
+                        }
+                    });
+                }, (error) => console.error("Error Firebase:", error));
+
             } else {
+                // UI de Salida
                 currentUserId = null;
                 document.getElementById('login-view').classList.remove('hidden');
                 document.getElementById('app-view').classList.add('hidden');
-                document.getElementById('tables-container').classList.add('hidden');
-                document.getElementById('loading-indicator').classList.remove('hidden');
                 if (unsubscribeSnapshot) unsubscribeSnapshot();
             }
         });
