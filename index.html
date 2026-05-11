@@ -56,69 +56,81 @@
         textarea { transition: border-color 0.2s; overflow: hidden; }
         .table-container { overflow-x: auto; }
         th { position: sticky; top: 0; z-index: 10; }
+
+        /* Animación suave para cambio de pantalla */
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
 
     <!-- Pantalla de Login -->
     <div id="login-view" class="fixed inset-0 bg-coosajo-blue flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 transition-all duration-500">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
             <div class="text-center mb-8">
-                <!-- Logo con el nombre exacto solicitado -->
-                <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo Coosajo" class="h-24 mx-auto mb-4 object-contain" 
-                     onerror="this.onerror=null; this.src='https://via.placeholder.com/200x100/ffffff/172e59?text=COOSAJO';">
+                <!-- Logo con nombre exacto solicitado y respaldo visual mejorado -->
+                <div class="h-24 flex items-center justify-center mb-4 overflow-hidden rounded-lg">
+                    <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo Coosajo" class="max-h-full object-contain" 
+                         onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
+                    <div id="logo-fallback" class="hidden w-full h-full bg-slate-50 items-center justify-center border-2 border-dashed border-slate-200">
+                        <span class="text-coosajo-blue font-black text-3xl tracking-tighter italic">COOSAJO</span>
+                    </div>
+                </div>
                 <h2 class="text-2xl font-extrabold text-gray-800">Acceso al Reporte</h2>
                 <p class="text-sm text-gray-500 mt-1">Vinculación Social</p>
             </div>
             <form id="login-form" class="space-y-6">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Usuario</label>
-                    <input type="text" id="username" value="sjemartinez" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all">
+                    <input type="text" id="username" value="sjemartinez" class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all" placeholder="Usuario">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
-                    <input type="password" id="password" value="Coosajo2041" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all">
+                    <input type="password" id="password" value="Coosajo2041" class="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all" placeholder="••••••••">
                 </div>
                 <div id="login-error" class="hidden text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 font-medium"></div>
-                <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-md active:scale-95">Ingresar</button>
+                <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                    <span id="btn-text">Ingresar al Reporte</span>
+                </button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6 font-mono tracking-tighter uppercase">Conexión Segura v2.1</p>
+            <p class="text-[10px] text-center text-gray-400 mt-6 font-mono tracking-widest uppercase">Sistema de Sincronización v2.2</p>
         </div>
     </div>
 
     <!-- Aplicación Principal -->
-    <div id="app-view" class="hidden min-h-screen flex flex-col">
+    <div id="app-view" class="hidden min-h-screen flex flex-col fade-in">
         <header class="bg-coosajo-blue text-white shadow-md print:shadow-none print:bg-transparent print:text-black">
             <div class="max-w-[1400px] mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
                 <div class="flex items-center mb-4 md:mb-0">
-                    <div class="bg-white p-1 rounded-lg shadow-sm">
-                        <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo Coosajo" class="h-10 w-auto"
-                             onerror="this.onerror=null; this.src='https://via.placeholder.com/100x40/ffffff/172e59?text=COOSAJO';">
+                    <div class="bg-white p-1.5 rounded-lg shadow-sm flex items-center justify-center">
+                        <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo" class="h-10 w-auto"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span class="hidden text-coosajo-blue font-bold text-sm px-2">COOSAJO</span>
                     </div>
                     <div class="ml-4">
-                        <h1 class="text-xl font-bold">Reporte de Publicaciones</h1>
-                        <p class="text-coosajo-green font-semibold text-sm print:text-gray-600 uppercase tracking-wider">Vinculación Social</p>
+                        <h1 class="text-xl font-bold leading-tight">Reporte de Publicaciones</h1>
+                        <p class="text-coosajo-green font-semibold text-xs print:text-gray-600 uppercase tracking-widest">Vinculación Social</p>
                     </div>
                 </div>
                 <div class="no-print flex flex-wrap gap-3 items-center">
-                    <div class="text-sm font-medium border border-blue-400 bg-blue-800/30 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                    <div class="text-[11px] font-bold border border-blue-400 bg-blue-800/30 px-3 py-2 rounded-lg flex items-center gap-2 uppercase">
                         <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        👤 <span id="user-display">sjemartinez</span>
+                        <span id="user-display">sjemartinez</span>
                     </div>
                     
-                    <div class="flex items-center bg-white rounded-lg shadow-sm px-3 py-1.5">
-                        <label for="monthFilter" class="text-sm font-bold text-coosajo-blue mr-2">Filtrar:</label>
-                        <select id="monthFilter" class="text-sm text-gray-700 focus:outline-none cursor-pointer bg-transparent font-medium">
-                            <option value="todos">Ambos Meses</option>
-                            <option value="abril">Solo Abril</option>
-                            <option value="marzo">Solo Marzo</option>
+                    <div class="flex items-center bg-white rounded-lg shadow-sm px-3 py-1.5 border border-slate-200">
+                        <label for="monthFilter" class="text-xs font-black text-coosajo-blue mr-2 uppercase">Mes:</label>
+                        <select id="monthFilter" class="text-xs text-gray-700 focus:outline-none cursor-pointer bg-transparent font-bold uppercase">
+                            <option value="todos">Todos</option>
+                            <option value="abril">Abril</option>
+                            <option value="marzo">Marzo</option>
                         </select>
                     </div>
                     
-                    <button id="btn-export" class="bg-coosajo-green hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-bold active:scale-95">
-                        Exportar PDF
+                    <button id="btn-export" class="bg-coosajo-green hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition text-xs font-bold active:scale-95">
+                        PDF
                     </button>
-                    <button id="btn-logout" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg shadow transition text-sm font-bold active:scale-95">
+                    <button id="btn-logout" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg shadow transition text-xs font-bold active:scale-95">
                         Salir
                     </button>
                 </div>
@@ -126,26 +138,29 @@
         </header>
 
         <main class="max-w-[1400px] mx-auto px-4 py-8 sm:px-6 lg:px-8 flex-1 w-full">
-            <div id="loading-indicator" class="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-inner">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-coosajo-green"></div>
-                <p class="mt-4 text-coosajo-blue font-bold text-lg">Iniciando Sincronización...</p>
-                <p class="text-gray-400 text-sm mt-2">Accediendo a la base de datos de Vinculación Social.</p>
+            <div id="loading-indicator" class="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-gray-200 shadow-inner">
+                <div class="inline-block animate-spin rounded-full h-14 w-14 border-b-4 border-coosajo-green"></div>
+                <p class="mt-6 text-coosajo-blue font-black text-xl tracking-tight">Estableciendo conexión...</p>
+                <p class="text-gray-400 text-sm mt-2">Sincronizando datos de Marzo y Abril</p>
             </div>
 
-            <div id="tables-container" class="hidden space-y-12">
+            <div id="tables-container" class="hidden space-y-16">
                 <!-- ABRIL -->
                 <section id="section-abril">
-                    <h2 class="text-2xl font-extrabold text-coosajo-blue border-b-4 border-coosajo-green inline-block mb-6 pb-1">Reporte Mensual: Abril</h2>
-                    <div class="bg-white shadow-xl rounded-2xl border border-gray-200 table-container overflow-hidden">
+                    <div class="flex items-center gap-4 mb-6">
+                        <h2 class="text-2xl font-black text-coosajo-blue uppercase tracking-tighter">Reporte Abril</h2>
+                        <div class="flex-1 h-1 bg-coosajo-green rounded-full opacity-30"></div>
+                    </div>
+                    <div class="bg-white shadow-2xl rounded-2xl border border-gray-200 table-container overflow-hidden">
                         <table class="min-w-full text-left text-sm">
-                            <thead class="bg-coosajo-blue text-white">
+                            <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-widest">
                                 <tr>
                                     <th class="p-4 w-24">Fecha</th>
                                     <th class="p-4 w-32">Eje</th>
                                     <th class="p-4 w-48">Frase Original</th>
                                     <th class="p-4 w-40">Estado</th>
                                     <th class="p-4 min-w-[200px]">Post Publicado</th>
-                                    <th class="p-4 min-w-[200px]">Motivo de Cambio</th>
+                                    <th class="p-4 min-w-[200px]">Observaciones</th>
                                     <th class="p-4 w-40">Evidencia</th>
                                 </tr>
                             </thead>
@@ -156,16 +171,19 @@
 
                 <!-- MARZO -->
                 <section id="section-marzo">
-                    <h2 class="text-2xl font-extrabold text-coosajo-blue border-b-4 border-coosajo-green inline-block mb-6 pb-1">Reporte Mensual: Marzo</h2>
-                    <div class="bg-white shadow-xl rounded-2xl border border-gray-200 table-container overflow-hidden">
+                    <div class="flex items-center gap-4 mb-6">
+                        <h2 class="text-2xl font-black text-coosajo-blue uppercase tracking-tighter">Reporte Marzo</h2>
+                        <div class="flex-1 h-1 bg-coosajo-green rounded-full opacity-30"></div>
+                    </div>
+                    <div class="bg-white shadow-2xl rounded-2xl border border-gray-200 table-container overflow-hidden">
                         <table class="min-w-full text-left text-sm">
-                            <thead class="bg-coosajo-blue text-white">
+                            <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-widest">
                                 <tr>
                                     <th class="p-4 w-48">Frase Original</th>
                                     <th class="p-4 w-48">Copy Sugerido</th>
                                     <th class="p-4 w-40">Estado</th>
                                     <th class="p-4 min-w-[200px]">Post Publicado</th>
-                                    <th class="p-4 min-w-[200px]">Motivo de Cambio</th>
+                                    <th class="p-4 min-w-[200px]">Observaciones</th>
                                     <th class="p-4 w-40">Evidencia</th>
                                 </tr>
                             </thead>
@@ -182,7 +200,7 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN DE FIREBASE
+        // CONFIGURACIÓN DE FIREBASE OBLIGATORIA
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const app = initializeApp(firebaseConfig);
@@ -192,62 +210,62 @@
         let unsubscribeSnapshot = null;
         let debounceTimers = {};
 
-        // Datos Abril
+        // Datos del Reporte (Estructura estática)
         const abrilData = [
-            { id: "A01", fecha: "7 de abril", eje: "Becas", frase: "El cooperativismo convierte el esfuerzo colectivo en oportunidades." },
-            { id: "A02", fecha: "8 de abril", eje: "Finanzas", frase: "Un asociado informado es un asociado empoderado." },
-            { id: "A03", fecha: "9 de abril", eje: "Ambiente", frase: "Proteger la naturaleza es proteger el mañana." },
-            { id: "A04", fecha: "10 de abril", eje: "Mujeres", frase: "El cooperativismo impulsa la participación económica femenina." },
-            { id: "A05", fecha: "11 de abril", eje: "Técnica", frase: "Aprender un oficio es formarse para producir." },
-            { id: "A06", fecha: "12 de abril", eje: "Becas", frase: "Nuestra cooperativa educa, apoya y cree." },
-            { id: "A07", fecha: "13 de abril", eje: "Juventud", frase: "Juventud + cooperativismo = ideas que transforman." },
-            { id: "A08", fecha: "14 de abril", eje: "Finanzas", frase: "Promovemos el crédito responsable." },
-            { id: "A09", fecha: "15 de abril", eje: "Ambiente", frase: "Cuidar la naturaleza es un acto cooperativo." },
-            { id: "A10", fecha: "16 de abril", eje: "Empresa", frase: "Emprender juntos nos hace más fuertes." },
-            { id: "A11", fecha: "17 de abril", eje: "Becas", frase: "Nuestros programas nacen de la ayuda mutua." },
-            { id: "A12", fecha: "18 de abril", eje: "Técnica", frase: "La formación técnica fortalece capacidades." },
-            { id: "A13", fecha: "19 de abril", eje: "Finanzas", frase: "La educación financiera no solo habla de dinero." },
-            { id: "A14", fecha: "20 de abril", eje: "Ambiente", frase: "Cooperar también es proteger la vida." },
-            { id: "A15", fecha: "21 de abril", eje: "Juventud", frase: "Empoderamos a la juventud para liderar con valores." },
-            { id: "A16", fecha: "22 de abril", eje: "Mujeres", frase: "Cuando las mujeres crecen, la comunidad progresa." },
-            { id: "A17", fecha: "23 de abril", eje: "Becas", frase: "Invertimos en educación porque creemos en las personas." },
-            { id: "A18", fecha: "24 de abril", eje: "Técnica", frase: "Enseñar a hacer y a construir juntos." },
-            { id: "A19", fecha: "25 de abril", eje: "Finanzas", frase: "El ahorro construye futuro." },
-            { id: "A20", fecha: "26 de abril", eje: "Juventud", frase: "Talento joven para desarrollo comunitario." },
-            { id: "A21", fecha: "27 de abril", eje: "Ambiente", frase: "El cuidado ambiental es compromiso de todos." },
-            { id: "A22", fecha: "28 de abril", eje: "Becas", frase: "Cuando una persona estudia, la comunidad avanza." },
-            { id: "A23", fecha: "29 de abril", eje: "Empresa", frase: "Propósitos compartidos transforman realidades." },
-            { id: "A24", fecha: "30 de abril", eje: "Finanzas", frase: "Un presupuesto personal te da libertad." }
+            { id: "A01", fecha: "7 abr", eje: "Becas", frase: "El cooperativismo convierte el esfuerzo colectivo en oportunidades reales." },
+            { id: "A02", fecha: "8 abr", eje: "Finanzas", frase: "Un asociado informado es un asociado empoderado." },
+            { id: "A03", fecha: "9 abr", eje: "Ambiente", frase: "Proteger la naturaleza es proteger el mañana." },
+            { id: "A04", fecha: "10 abr", eje: "Mujeres", frase: "El cooperativismo impulsa la participación económica femenina." },
+            { id: "A05", fecha: "11 abr", eje: "Técnica", frase: "Aprender un oficio es formarse para producir con valores." },
+            { id: "A06", fecha: "12 abr", eje: "Becas", frase: "Nuestra cooperativa educa, apoya y cree en el mañana." },
+            { id: "A07", fecha: "13 abr", eje: "Juventud", frase: "Juventud + cooperativismo = ideas que transforman." },
+            { id: "A08", fecha: "14 abr", eje: "Finanzas", frase: "Promovemos el crédito responsable." },
+            { id: "A09", fecha: "15 abr", eje: "Ambiente", frase: "Cuidar la naturaleza es un acto cooperativo." },
+            { id: "A10", fecha: "16 abr", eje: "Empresa", frase: "Emprender juntos nos hace más fuertes." },
+            { id: "A11", fecha: "17 abr", eje: "Becas", frase: "Programas que nacen de la solidaridad." },
+            { id: "A12", fecha: "18 abr", eje: "Técnica", frase: "La formación técnica fortalece capacidades." },
+            { id: "A13", fecha: "19 abr", eje: "Finanzas", frase: "La educación financiera habla de valores." },
+            { id: "A14", fecha: "20 abr", eje: "Ambiente", frase: "Cooperar también es proteger la vida." },
+            { id: "A15", fecha: "21 abr", eje: "Juventud", frase: "Empoderamos a la juventud para liderar con valores." },
+            { id: "A16", fecha: "22 abr", eje: "Mujeres", frase: "Cuando las mujeres crecen, la comunidad progresa." },
+            { id: "A17", fecha: "23 abr", eje: "Becas", frase: "Invertimos en educación porque creemos en las personas." },
+            { id: "A18", fecha: "24 abr", eje: "Técnica", frase: "Construir juntos a través del aprendizaje." },
+            { id: "A19", fecha: "25 abr", eje: "Finanzas", frase: "El ahorro cooperativo construye futuro." },
+            { id: "A20", fecha: "26 abr", eje: "Juventud", frase: "Talento joven para desarrollo comunitario." },
+            { id: "A21", fecha: "27 abr", eje: "Ambiente", frase: "El compromiso ambiental es de todos." },
+            { id: "A22", fecha: "28 abr", eje: "Becas", frase: "Cuando alguien estudia, la comunidad avanza." },
+            { id: "A23", fecha: "29 abr", eje: "Empresa", frase: "Propósitos compartidos transforman comunidades." },
+            { id: "A24", fecha: "30 abr", eje: "Finanzas", frase: "Un presupuesto personal te da libertad." }
         ];
 
-        // Datos Marzo
         const marzoData = [
-            { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Crecimiento y emprendimiento femenino." },
+            { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Acompañamos mujeres que desean crecer." },
             { id: "M02", frase: "Creer en el poder propio impulsa el negocio.", copy: "Formación y confianza para emprendedoras." },
-            { id: "M03", frase: "Emprender es florecer por dentro.", copy: "Academia para construir negocios con identidad." },
-            { id: "M04", frase: "Semilla llena de posibilidades.", copy: "Acompañamiento para el máximo potencial." },
-            { id: "M05", frase: "Empoderarse es florecer raíces.", copy: "Bases firmes para negocios liderados por mujeres." },
-            { id: "M06", frase: "Cuando ella florece, la comunidad también.", copy: "Transformando realidades a través del crecimiento femenino." },
+            { id: "M03", frase: "El primer paso es florecer por dentro.", copy: "Academia para construir negocios con identidad." },
+            { id: "M04", frase: "Cada mujer es una semilla llena de posibilidades.", copy: "Acompañamiento para el máximo potencial." },
+            { id: "M05", frase: "Empoderarse es florecer raíces.", copy: "Bases firmes para negocios de mujeres." },
+            { id: "M06", frase: "Cuando ella florece, la comunidad también.", copy: "Transformando realidades desde el crecimiento femenino." },
             { id: "M07", frase: "Dirección clara convierte sueños en proyectos.", copy: "BRÚJULA: Estrategia y rumbo definido." },
-            { id: "M08", frase: "Tu idea necesita dirección.", copy: "Guía paso a paso para avanzar con seguridad." },
-            { id: "M09", frase: "El emprendedor necesita una brújula.", copy: "Visión estratégica para tu negocio." },
-            { id: "M10", frase: "Decisiones guiadas crean negocios sólidos.", copy: "Claridad y acompañamiento emprendedor." },
-            { id: "M11", frase: "Con dirección llegas más lejos.", copy: "Avanzando con propósito definido." },
-            { id: "M12", frase: "Trazamos el camino de tu negocio.", copy: "Orientación desde la esencia." },
-            { id: "M13", frase: "Herramientas digitales abren puertas.", copy: "RED: Conocimiento actual para tu marca." }
+            { id: "M08", frase: "Tu idea ya tiene valor, necesita dirección.", copy: "Guía paso a paso para avanzar con seguridad." },
+            { id: "M09", frase: "Todo emprendedor necesita una brújula.", copy: "Trabajamos para fortalecer tu negocio." },
+            { id: "M10", frase: "Negocios sólidos nacen de decisiones guiadas.", copy: "Claridad y acompañamiento estratégico." },
+            { id: "M11", frase: "Un emprendedor con dirección llega lejos.", copy: "Acompañando tus pasos con propósito." },
+            { id: "M12", frase: "Cada emprendimiento tiene un camino.", copy: "Orientación para fortalecer tu esencia." },
+            { id: "M13", frase: "Herramientas digitales abren nuevas puertas.", copy: "RED: Conectando con conocimiento actual." }
         ];
 
-        // Sincronización
+        // FUNCIONES DE SINCRONIZACIÓN (Regla 1 y 2)
         window.saveData = async (id, type, value) => {
             clearTimeout(debounceTimers[`${id}_${type}`]);
             debounceTimers[`${id}_${type}`] = setTimeout(async () => {
                 try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'coosajo_report_v2', id);
+                    // RUTA ESTRICTA OBLIGATORIA
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'coosajo_report_final', id);
                     await setDoc(docRef, { [type]: value }, { merge: true });
                 } catch (err) {
-                    console.error("Save Error:", err);
+                    console.error("Firebase Sync Error:", err);
                 }
-            }, 600);
+            }, 500);
         };
 
         window.autoResize = (el) => {
@@ -264,14 +282,14 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400;
+                    const MAX_WIDTH = 450;
                     let width = img.width;
                     let height = img.height;
                     if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                     canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.5); 
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.4); 
                     window.saveData(id, 'image', dataUrl);
                     document.getElementById(`img-${id}`).src = dataUrl;
                     document.getElementById(`img-box-${id}`).classList.remove('hidden');
@@ -287,18 +305,18 @@
             document.getElementById(`img-box-${id}`).classList.add('hidden');
         };
 
-        // UI Builder
+        // UI BUILDER
         const buildRow = (item, isAbril) => `
-            <tr class="hover:bg-blue-50 transition-colors border-b border-gray-100">
+            <tr class="hover:bg-blue-50 transition-colors border-b border-gray-100 group">
                 ${isAbril ? `
-                    <td class="p-4 border-r font-bold text-coosajo-blue">${item.fecha}</td>
-                    <td class="p-4 border-r text-gray-700 text-[10px] uppercase font-bold tracking-tighter">${item.eje}</td>
+                    <td class="p-4 border-r font-black text-coosajo-blue text-xs">${item.fecha}</td>
+                    <td class="p-4 border-r text-gray-700 text-[10px] font-bold uppercase tracking-tighter">${item.eje}</td>
                 ` : ``}
-                <td class="p-4 border-r text-gray-600 italic">"${item.frase}"</td>
-                ${!isAbril ? `<td class="p-4 border-r text-gray-700 text-xs">${item.copy}</td>` : ``}
+                <td class="p-4 border-r text-gray-600 italic text-xs leading-relaxed">"${item.frase}"</td>
+                ${!isAbril ? `<td class="p-4 border-r text-gray-700 text-[10px] font-medium italic">${item.copy}</td>` : ``}
                 <td class="p-4 border-r align-top">
                     <select id="st-${item.id}" onchange="window.saveData('${item.id}', 'status', this.value)"
-                        class="w-full border rounded-lg p-1.5 text-[10px] font-bold">
+                        class="w-full border rounded-lg p-2 text-[10px] font-black uppercase focus:ring-1 focus:ring-coosajo-blue cursor-pointer">
                         <option value="publicado_igual">🔵 Publicado Igual</option>
                         <option value="modificado">🟢 Modificado</option>
                         <option value="no_publicado">⚪ No publicado</option>
@@ -307,27 +325,40 @@
                 <td class="p-4 border-r align-top">
                     <textarea id="pt-${item.id}" rows="2" placeholder="Copy final..."
                         oninput="window.autoResize(this); window.saveData('${item.id}', 'post', this.value)"
-                        class="w-full bg-coosajo-light border p-2 text-xs rounded-lg"></textarea>
+                        class="w-full bg-coosajo-light border p-3 text-xs rounded-xl focus:ring-1 focus:ring-coosajo-blue"></textarea>
                 </td>
                 <td class="p-4 border-r align-top">
-                    <textarea id="rs-${item.id}" rows="2" placeholder="Motivo..."
+                    <textarea id="rs-${item.id}" rows="2" placeholder="¿Por qué el cambio?..."
                         oninput="window.autoResize(this); window.saveData('${item.id}', 'reason', this.value)"
-                        class="w-full border p-2 text-xs rounded-lg"></textarea>
+                        class="w-full border p-3 text-xs rounded-xl focus:ring-1 focus:ring-coosajo-green"></textarea>
                 </td>
                 <td class="p-4 align-top text-center">
-                    <label class="no-print cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] py-2 px-1 rounded-lg border block mb-2 transition font-bold uppercase">
-                        Subir Foto
+                    <label class="no-print cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] py-2 px-1 rounded-xl border block mb-2 transition active:scale-95 font-black uppercase">
+                        Subir Evidencia
                         <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
                     </label>
                     <div id="img-box-${item.id}" class="hidden">
-                        <img id="img-${item.id}" src="" class="w-full max-h-24 object-contain border rounded-lg mx-auto shadow-sm">
-                        <button class="no-print text-[10px] text-red-500 hover:underline mt-2 font-bold uppercase" onclick="window.delImg('${item.id}')">Quitar</button>
+                        <img id="img-${item.id}" src="" class="w-full max-h-28 object-contain border rounded-xl mx-auto shadow-md">
+                        <button class="no-print text-[10px] text-red-500 hover:underline mt-2 font-black uppercase" onclick="window.delImg('${item.id}')">Eliminar</button>
                     </div>
                 </td>
             </tr>
         `;
 
-        // Eventos
+        // MANEJO DE VISTAS
+        function switchView(toApp) {
+            const loginView = document.getElementById('login-view');
+            const appView = document.getElementById('app-view');
+            if (toApp) {
+                loginView.classList.add('hidden');
+                appView.classList.remove('hidden');
+            } else {
+                loginView.classList.remove('hidden');
+                appView.classList.add('hidden');
+            }
+        }
+
+        // LOGIN FORM
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const userVal = document.getElementById('username').value.trim();
@@ -336,25 +367,29 @@
             const btn = document.getElementById('btn-login');
             
             if (userVal !== 'sjemartinez' || passVal !== 'Coosajo2041') {
-                errorEl.innerText = "Credenciales incorrectas.";
+                errorEl.innerText = "Credenciales incorrectas para Vinculación Social.";
                 errorEl.classList.remove('hidden');
                 return;
             }
 
+            errorEl.classList.add('hidden');
             btn.disabled = true;
-            btn.innerText = "Validando...";
-            
+            document.getElementById('btn-text').innerText = "Validando acceso...";
+
             try {
+                // REGLA 3: Auth obligatoria
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (err) {
-                errorEl.innerText = "Error de red. Intente de nuevo.";
+                // El cambio de vista lo hará el onAuthStateChanged
+            } catch (error) {
+                console.error("Auth Failure:", error);
+                errorEl.innerText = "Error de conexión. Intente de nuevo.";
                 errorEl.classList.remove('hidden');
                 btn.disabled = false;
-                btn.innerText = "Ingresar";
+                document.getElementById('btn-text').innerText = "Ingresar al Reporte";
             }
         });
 
@@ -366,20 +401,22 @@
             document.getElementById('section-marzo').style.display = (v === 'todos' || v === 'marzo') ? 'block' : 'none';
         });
 
-        // Observador de Auth
+        // OBSERVADOR DE ESTADO (Cerebro de la App)
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('app-view').classList.remove('hidden');
+                switchView(true);
                 
                 const tbA = document.getElementById('abril-tbody');
                 const tbM = document.getElementById('marzo-tbody');
+                
+                // Generar tablas solo si están vacías
                 if(tbA.innerHTML.trim() === "") {
                     abrilData.forEach(i => tbA.innerHTML += buildRow(i, true));
                     marzoData.forEach(i => tbM.innerHTML += buildRow(i, false));
                 }
 
-                const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'coosajo_report_v2');
+                // Sincronización en tiempo real
+                const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'coosajo_report_final');
                 unsubscribeSnapshot = onSnapshot(postsRef, (snapshot) => {
                     document.getElementById('loading-indicator').classList.add('hidden');
                     document.getElementById('tables-container').classList.remove('hidden');
@@ -408,11 +445,11 @@
                         }
                     });
                 }, (err) => {
-                    document.getElementById('loading-indicator').innerHTML = `<p class="text-red-500">Error de conexión.</p>`;
+                    console.error("Firestore Error:", err);
+                    document.getElementById('loading-indicator').innerHTML = `<p class="text-red-500 font-bold p-4">Error de permisos. Contacte soporte.</p>`;
                 });
             } else {
-                document.getElementById('login-view').classList.remove('hidden');
-                document.getElementById('app-view').classList.add('hidden');
+                switchView(false);
                 if (unsubscribeSnapshot) unsubscribeSnapshot();
             }
         });
