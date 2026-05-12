@@ -2,8 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reporte de Publicaciones - Vinculación Social</title>
+    
+    <!-- Evitar caché -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,128 +36,94 @@
             table { width: 100%; border-collapse: collapse; }
             th, td { border: 1px solid #d1d5db !important; padding: 6px !important; }
             th { background-color: #172e59 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            tr { page-break-inside: avoid; }
-            textarea {
-                border: none !important;
-                resize: none !important;
-                background-color: transparent !important;
-                box-shadow: none !important;
-                overflow: hidden;
-                padding: 0 !important;
-                width: 100%;
-                font-family: inherit;
-            }
-            img { page-break-inside: avoid; max-height: 120px !important; }
+            textarea { border: none !important; background: transparent !important; height: auto !important; }
         }
         
-        textarea { transition: border-color 0.2s; overflow: hidden; }
-        .table-container { overflow-x: auto; }
+        textarea { transition: border-color 0.2s; min-height: 80px; resize: vertical; }
+        textarea:disabled { cursor: default; color: #475569; background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
+        select:disabled { cursor: default; color: #475569; appearance: none; background-color: #f8fafc !important; }
+        
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 1rem; }
         th { position: sticky; top: 0; z-index: 10; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800">
 
     <!-- Pantalla de Login -->
     <div id="login-view" class="fixed inset-0 bg-coosajo-blue flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transition-all duration-300">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md">
             <div class="text-center mb-8">
                 <div class="h-20 flex items-center justify-center mb-6">
-                    <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo Coosajo" class="max-h-full object-contain" 
-                         onerror="this.style.display='none'; document.getElementById('logo-text-fallback').style.display='block';">
-                    <div id="logo-text-fallback" class="hidden font-black text-4xl text-coosajo-blue tracking-tighter italic">COOSAJO</div>
+                    <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo Coosajo" class="max-h-full" 
+                         onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
+                    <div id="logo-fallback" class="hidden font-black text-4xl text-coosajo-blue italic">COOSAJO</div>
                 </div>
                 <h2 class="text-2xl font-black text-slate-800">Reporte Digital</h2>
-                <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-widest">Gestión de Publicaciones</p>
+                <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-widest">Vinculación Social</p>
             </div>
             <form id="login-form" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase ml-1">Usuario</label>
-                    <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all font-medium" placeholder="Ingrese su usuario">
-                </div>
-                <div>
-                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase ml-1">Contraseña</label>
-                    <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:ring-2 focus:ring-coosajo-blue focus:outline-none transition-all font-medium" placeholder="••••••••">
-                </div>
-                <div id="login-error" class="hidden text-[11px] text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 font-bold text-center"></div>
-                <button type="submit" id="btn-login" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-black py-4 px-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
-                    ACCEDER AL REPORTE
-                </button>
+                <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200 px-4 py-4 rounded-2xl focus:ring-2 focus:ring-coosajo-blue outline-none font-bold" placeholder="Usuario">
+                <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 px-4 py-4 rounded-2xl focus:ring-2 focus:ring-coosajo-blue outline-none font-bold" placeholder="Contraseña">
+                <div id="login-error" class="hidden text-xs text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 font-bold text-center"></div>
+                <button type="submit" class="w-full bg-coosajo-green hover:bg-green-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all active:scale-95">ACCEDER AL REPORTE</button>
             </form>
-            <p class="text-[9px] text-center text-slate-300 mt-8 font-mono tracking-widest uppercase">Vinculación Social v4.4</p>
         </div>
     </div>
 
     <!-- Aplicación Principal -->
     <div id="app-view" class="hidden min-h-screen flex flex-col fade-in">
-        <header class="bg-coosajo-blue text-white shadow-lg print:shadow-none print:bg-white print:text-black">
-            <div class="max-w-[1500px] mx-auto px-4 py-4 w-full flex flex-col md:flex-row items-center justify-between gap-4">
+        <header class="bg-coosajo-blue text-white shadow-lg sticky top-0 z-40">
+            <div class="max-w-[1600px] mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
                 <div class="flex items-center">
-                    <div class="bg-white p-2 rounded-xl shadow-inner flex items-center justify-center h-12 w-32 overflow-hidden">
-                        <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo" class="max-h-full"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <span class="hidden text-coosajo-blue font-black text-lg italic">COOSAJO</span>
+                    <div class="bg-white p-1 rounded-lg h-10 w-24 flex items-center justify-center">
+                        <img src="LOGO COOSAJO SIN ESLOGAN.png" alt="Logo" class="max-h-full">
                     </div>
-                    <div class="ml-5">
-                        <h1 class="text-xl font-black leading-tight tracking-tight">Reporte de Publicaciones</h1>
-                        <p class="text-coosajo-green font-bold text-[10px] uppercase tracking-[0.2em] print:text-slate-500">Vinculación Social</p>
+                    <div class="ml-4">
+                        <h1 class="text-lg font-black leading-none">Reporte Digital</h1>
+                        <p id="user-role-tag" class="text-coosajo-green font-bold text-[9px] uppercase tracking-wider">Cargando modo...</p>
                     </div>
                 </div>
                 
-                <div class="no-print flex flex-wrap gap-3 items-center">
-                    <div class="text-[10px] font-black border border-blue-400 bg-blue-900/40 px-4 py-2 rounded-xl flex items-center gap-2 uppercase tracking-tighter">
-                        <span class="w-2 h-2 bg-green-400 rounded-full shadow-[0_0_8px_#4ade80]"></span>
-                        <span id="user-display-name">Sesión Activa</span>
+                <div class="no-print flex flex-wrap justify-center gap-2 items-center">
+                    <div class="text-[10px] font-black border border-blue-400 bg-blue-900/40 px-3 py-1.5 rounded-xl flex items-center gap-2 uppercase">
+                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        <span id="user-label">Sesión Activa</span>
                     </div>
                     
-                    <div class="flex items-center bg-white rounded-xl shadow-sm px-3 py-2 border border-slate-200">
-                        <label for="monthFilter" class="text-[10px] font-black text-coosajo-blue mr-2 uppercase">Filtrar:</label>
-                        <select id="monthFilter" class="text-[11px] text-slate-700 focus:outline-none cursor-pointer bg-transparent font-bold uppercase">
-                            <option value="todos">Marzo y Abril</option>
-                            <option value="abril">Mes: Abril</option>
-                            <option value="marzo">Mes: Marzo</option>
-                        </select>
-                    </div>
+                    <select id="monthFilter" class="bg-white text-slate-700 px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase border border-slate-200 outline-none">
+                        <option value="todos">Marzo y Abril</option>
+                        <option value="abril">Mes: Abril</option>
+                        <option value="marzo">Mes: Marzo</option>
+                    </select>
                     
-                    <button id="btn-export" class="bg-white text-coosajo-blue hover:bg-slate-100 px-5 py-2 rounded-xl shadow-md transition-all text-xs font-black active:scale-95 uppercase">
-                        Generar PDF
-                    </button>
-                    <button id="btn-logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow-md transition-all text-xs font-black active:scale-95 uppercase">
-                        Cerrar
-                    </button>
+                    <button id="btn-export" class="bg-white text-coosajo-blue px-4 py-1.5 rounded-xl text-[10px] font-black uppercase shadow-sm">PDF</button>
+                    <button id="btn-logout" class="bg-red-500 text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase shadow-sm">Salir</button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-[1500px] mx-auto px-4 py-8 w-full flex-1">
-            <div id="loading-indicator" class="text-center py-32 bg-white rounded-[2rem] border-2 border-dashed border-slate-200 shadow-xl">
-                <div class="relative inline-block">
-                    <div class="h-16 w-16 rounded-full border-4 border-slate-100 border-t-coosajo-green animate-spin"></div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="h-8 w-8 bg-coosajo-blue rounded-lg animate-pulse"></div>
-                    </div>
-                </div>
-                <p class="mt-8 text-coosajo-blue font-black text-2xl tracking-tighter">Sincronizando registros...</p>
+        <main class="max-w-[1600px] mx-auto px-2 md:px-4 py-6 w-full flex-1">
+            <div id="loading-indicator" class="text-center py-20">
+                <div class="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-coosajo-green border-r-transparent"></div>
+                <p class="mt-4 text-coosajo-blue font-black uppercase text-[10px] tracking-widest">Sincronizando con Firebase...</p>
             </div>
 
-            <div id="tables-container" class="hidden space-y-20">
-                <!-- SECCIÓN ABRIL (INTACTA) -->
-                <section id="section-abril" class="fade-in">
-                    <div class="flex items-center gap-6 mb-8">
-                        <h2 class="text-3xl font-black text-coosajo-blue uppercase tracking-tighter">Mes de Abril</h2>
-                        <div class="flex-1 h-1.5 bg-gradient-to-r from-coosajo-green to-transparent rounded-full opacity-30"></div>
-                    </div>
-                    <div class="bg-white shadow-2xl rounded-3xl border border-slate-200 table-container overflow-hidden">
-                        <table class="min-w-full text-left text-sm">
-                            <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-[0.15em] font-black">
+            <div id="tables-container" class="hidden space-y-16">
+                <!-- SECCIÓN ABRIL -->
+                <section id="section-abril">
+                    <h2 class="text-xl font-black text-coosajo-blue uppercase mb-4 px-2">Mes de Abril</h2>
+                    <div class="bg-white shadow-xl border border-slate-200 table-container">
+                        <table class="min-w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-coosajo-blue uppercase text-[9px] font-black border-b">
                                 <tr>
-                                    <th class="p-5 w-24">Fecha</th>
-                                    <th class="p-5 w-32">Eje Social</th>
-                                    <th class="p-5 w-60">Frase Propuesta</th>
-                                    <th class="p-5 w-44">Estado</th>
-                                    <th class="p-5 min-w-[280px]">Justificación / Comentario</th>
-                                    <th class="p-5 w-44">Evidencia</th>
+                                    <th class="p-4 w-20">Fecha</th>
+                                    <th class="p-4 w-28">Eje</th>
+                                    <th class="p-4">Propuesta</th>
+                                    <th class="p-4 w-32">Estado</th>
+                                    <th class="p-4 min-w-[200px]">Justificación</th>
+                                    <th class="p-4 w-40 text-center">Evidencia</th>
                                 </tr>
                             </thead>
                             <tbody id="abril-tbody" class="divide-y divide-slate-100"></tbody>
@@ -159,21 +131,18 @@
                     </div>
                 </section>
 
-                <!-- SECCIÓN MARZO (DEPURADA) -->
-                <section id="section-marzo" class="fade-in">
-                    <div class="flex items-center gap-6 mb-8">
-                        <h2 class="text-3xl font-black text-coosajo-blue uppercase tracking-tighter">Mes de Marzo</h2>
-                        <div class="flex-1 h-1.5 bg-gradient-to-r from-coosajo-green to-transparent rounded-full opacity-30"></div>
-                    </div>
-                    <div class="bg-white shadow-2xl rounded-3xl border border-slate-200 table-container overflow-hidden">
-                        <table class="min-w-full text-left text-sm">
-                            <thead class="bg-coosajo-blue text-white uppercase text-[10px] tracking-[0.15em] font-black">
+                <!-- SECCIÓN MARZO -->
+                <section id="section-marzo">
+                    <h2 class="text-xl font-black text-coosajo-blue uppercase mb-4 px-2">Mes de Marzo</h2>
+                    <div class="bg-white shadow-xl border border-slate-200 table-container">
+                        <table class="min-w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-coosajo-blue uppercase text-[9px] font-black border-b">
                                 <tr>
-                                    <th class="p-5 w-60">Frase Original</th>
-                                    <th class="p-5 w-60">Copy de Referencia</th>
-                                    <th class="p-5 w-44">Estado</th>
-                                    <th class="p-5 min-w-[280px]">Justificación / Comentario</th>
-                                    <th class="p-5 w-44">Evidencia</th>
+                                    <th class="p-4 w-48">Frase Original</th>
+                                    <th class="p-4 w-48">Referencia</th>
+                                    <th class="p-4 w-32">Estado</th>
+                                    <th class="p-4 min-w-[200px]">Justificación</th>
+                                    <th class="p-4 w-40 text-center">Evidencia</th>
                                 </tr>
                             </thead>
                             <tbody id="marzo-tbody" class="divide-y divide-slate-100"></tbody>
@@ -185,13 +154,12 @@
     </div>
 
     <!-- Modal Borrar -->
-    <div id="delete-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full text-center">
-            <h3 class="text-xl font-black text-slate-800 mb-2">¿Eliminar esta fila?</h3>
-            <p class="text-slate-500 text-sm mb-6">Esta acción ocultará la fila para todos.</p>
+    <div id="delete-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[100] p-6">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-xs w-full text-center">
+            <h3 class="text-lg font-black text-slate-800 mb-4">¿Borrar esta fila?</h3>
             <div class="flex gap-3">
-                <button id="cancel-delete" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold">Cancelar</button>
-                <button id="confirm-delete" class="flex-1 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold">Eliminar</button>
+                <button id="cancel-delete" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold">No</button>
+                <button id="confirm-delete" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Sí, borrar</button>
             </div>
         </div>
     </div>
@@ -217,10 +185,11 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let unsubscribeSnapshot = null;
         let debounceTimers = {};
         let currentDeleteId = null;
-        let activeUser = null;
+        let localUser = localStorage.getItem('elian_user_id') || "";
+
+        const isAdmin = () => localUser === 'sjemartinez';
 
         const abrilData = [
             { id: "A01", fecha: "7 abr", eje: "Becas", frase: "El cooperativismo convierte el esfuerzo colectivo en oportunidades reales." },
@@ -249,40 +218,40 @@
             { id: "A24", fecha: "30 abr", eje: "Finanzas", frase: "Tener un presupuesto personal te da libertad real." }
         ];
 
-        // MARZO - He conservado los IDs M01 a M12 para que no pierdas tus datos guardados
         const marzoData = [
             { id: "M01", frase: "Cuando una mujer se descubre, florece.", copy: "FLORECE: Acompañamos a mujeres en su crecimiento." },
             { id: "M02", frase: "Creer en el poder propio impulsa el negocio.", copy: "Formación y confianza para emprendedoras." },
             { id: "M03", frase: "Emprender es florecer por dentro.", copy: "Academia para construir negocios con identidad." },
-            { id: "M04", frase: "Cada mujer es una semilla llena de posibilidades.", copy: "FLORECE ofrece el espacio, el acompañamiento y las herramientas para que cada mujer alcance su máximo potencial." },
+            { id: "M04", frase: "Cada mujer es una semilla llena de posibilidades.", copy: "FLORECE ofrece el espacio y las herramientas." },
             { id: "M05", frase: "Empoderarse es florecer raíces hacia el futuro.", copy: "Bases firmes para negocios de mujeres." },
             { id: "M06", frase: "Cuando ella florece, la comunidad también.", copy: "Transformando realidades desde el crecimiento femenino." },
             { id: "M07", frase: "Dirección clara convierte sueños en proyectos.", copy: "BRÚJULA: Estrategia y rumbo definido para emprender." },
-            { id: "M08", frase: "Todo emprendedor necesita una brújula.", copy: "Trabajamos contigo para fortalecer tu negocio desde una visión estratégica." },
-            { id: "M09", frase: "Negocios sólidos nacen de decisiones guiadas.", copy: "BRÚJULA es el espacio donde los emprendedores encuentran claridad y acompañamiento." },
+            { id: "M08", frase: "Todo emprendedor necesita una brújula.", copy: "Trabajamos contigo para fortalecer tu negocio." },
+            { id: "M09", frase: "Negocios sólidos nacen de decisiones guiadas.", copy: "Claridad y acompañamiento para el éxito local." },
             { id: "M10", frase: "Un emprendedor con dirección llega lejos.", copy: "Acompañamos tus pasos con propósito real." },
-            { id: "M11", frase: "Cada emprendimiento tiene un camino.", copy: "Orientación para fortalecer tu marca desde la esencia." },
+            { id: "M11", frase: "Cada emprendimiento tiene un camino.", copy: "Orientación para fortalecer tu marca." },
             { id: "M12", frase: "Herramientas digitales abren nuevas puertas.", copy: "RED: Conectando con conocimiento que impulsa." },
-            { id: "M13", frase: "Dominar herramientas digitales es abrir nuevas puertas para tu emprendimiento.", copy: "RED te conecta con conocimiento actual que impulsa tu marca en el mundo digital." },
-            { id: "M14", frase: "Un emprendedor digital está preparado para los desafíos del futuro.", copy: "Te acompañamos para que tu negocio aproveche todo el potencial de la era digital." },
-            { id: "M15", frase: "El mundo avanza rápido, y tu negocio puede avanzar con él.", copy: "En RED aprendemos herramientas tecnológicas que ayudan a emprender mejor." },
-            { id: "M16", frase: "Una marca con presencia digital tiene más oportunidades de crecer.", copy: "RED impulsa a emprendedores a fortalecer su comunicación y proyección online." },
-            { id: "M17", frase: "Tus habilidades digitales pueden llevar tu emprendimiento más lejos.", copy: "Descubre nuevas formas de emprender a través de herramientas tecnológicas." },
-            { id: "M18", frase: "Cuando un joven descubre su capacidad de crear, todo su futuro cambia.", copy: "ACCESO JOVEN despierta el interés de emprender e innovar." },
-            { id: "M19", frase: "La innovación nace en una mente joven que se atreve a imaginar nuevas soluciones.", copy: "Impulsamos habilidades para que los jóvenes transformen ideas en proyectos reales." },
-            // M21, M25, M26 y M29 eliminadas según tu petición
-            { id: "M27", frase: "Cuando enseñamos valores desde pequeños, sembramos adultos responsables.", copy: "Wachalal forma niños y jóvenes con visión financiera y cooperativa." },
-            { id: "M28", frase: "Los niños que aprenden a cooperar crecen siendo mejores ciudadanos.", copy: "Wachalal impulsa valores que unen y transforman." },
-            { id: "M30", frase: "La educación financiera te permite caminar con más seguridad hacia tus metas.", copy: "Te acompañamos a administrar mejor tus recursos." },
-            { id: "M31", frase: "Organizar tus finanzas es un acto de amor hacia tu futuro.", copy: "HUELLAS ofrece herramientas para una vida más estable." },
-            { id: "M32", frase: "Las habilidades blandas construyen relaciones, oportunidades y crecimiento personal.", copy: "Formación para fortalecer tu comunicación, liderazgo y confianza." },
-            { id: "M33", frase: "La organización comunitaria es la base del desarrollo sostenible.", copy: "Impulsamos la unión, la participación y el liderazgo." },
-            { id: "M34", frase: "Sembrar conocimiento es la base para cosechar mejores resultados.", copy: "Formación agrícola que impulsa sostenibilidad y productividad." },
-            { id: "M35", frase: "Cada cultivo cuenta una historia de esfuerzo, disciplina y aprendizaje.", copy: "Apoyamos a agricultores para mejorar su producción." }
+            { id: "M13", frase: "Dominar herramientas digitales es abrir nuevas puertas para tu emprendimiento.", copy: "RED te conecta con conocimiento actual." },
+            { id: "M14", frase: "Un emprendedor digital está preparado para los desafíos del futuro.", copy: "Aprovecha todo el potencial de la era digital." },
+            { id: "M15", frase: "El mundo avanza rápido, y tu negocio puede avanzar con él.", copy: "Herramientas tecnológicas que ayudan a emprender." },
+            { id: "M16", frase: "Una marca con presencia digital tiene más oportunidades de crecer.", copy: "Fortalecemos tu comunicación online." },
+            { id: "M17", frase: "Tus habilidades digitales pueden llevar tu emprendimiento más lejos.", copy: "Nuevas formas de emprender." },
+            { id: "M18", frase: "Cuando un joven descubre su capacidad de crear, todo su futuro cambia.", copy: "ACCESO JOVEN despierta el interés de innovar." },
+            { id: "M19", frase: "La innovación nace en una mente joven que se atreve a imaginar nuevas soluciones.", copy: "Transforma ideas en proyectos reales." },
+            { id: "M27", frase: "Cuando enseñamos valores desde pequeños, sembramos adultos responsables.", copy: "Wachalal forma niños con visión cooperativa." },
+            { id: "M28", frase: "Los niños que aprenden a cooperar crecen siendo mejores ciudadanos.", copy: "Valores que unen y transforman." },
+            { id: "M30", frase: "La educación financiera te permite caminar con más seguridad hacia tus metas.", copy: "Administra mejor tus recursos." },
+            { id: "M31", frase: "Organizar tus finanzas es un acto de amor hacia tu futuro.", copy: "HUELLAS ofrece herramientas para la estabilidad." },
+            { id: "M32", frase: "Las habilidades blandas construyen relaciones, oportunidades y crecimiento personal.", copy: "Comunicación, liderazgo y confianza." },
+            { id: "M33", frase: "La organización comunitaria es la base del desarrollo sostenible.", copy: "Unión, participación y liderazgo." },
+            { id: "M34", frase: "Sembrar conocimiento es la base para cosechar mejores resultados.", copy: "Formación agrícola que impulsa productividad." },
+            { id: "M35", frase: "Cada cultivo cuenta una historia de esfuerzo, disciplina y aprendizaje.", copy: "Apoyo a agricultores para mejorar su producción." }
         ];
 
+        window.autoResize = (el) => { if(!el) return; el.style.height = 'auto'; el.style.height = (el.scrollHeight) + 'px'; };
+
         window.saveData = async (id, type, value) => {
-            if (!auth.currentUser) return;
+            if (!isAdmin()) return; 
             clearTimeout(debounceTimers[`${id}_${type}`]);
             debounceTimers[`${id}_${type}`] = setTimeout(async () => {
                 try {
@@ -292,13 +261,8 @@
             }, 500);
         };
 
-        window.autoResize = (el) => {
-            if(!el) return;
-            el.style.height = 'auto';
-            el.style.height = (el.scrollHeight) + 'px';
-        };
-
         window.uploadImg = (event, id) => {
+            if (!isAdmin()) return;
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -320,17 +284,10 @@
             reader.readAsDataURL(file);
         };
 
-        window.delImg = (id) => { window.saveData(id, 'image', null); };
-
-        window.askDeleteRow = (id) => {
-            currentDeleteId = id;
-            document.getElementById('delete-modal').classList.remove('hidden');
-        };
-
-        document.getElementById('cancel-delete').addEventListener('click', () => {
-            document.getElementById('delete-modal').classList.add('hidden');
-        });
-
+        window.delImg = (id) => { if (isAdmin()) window.saveData(id, 'image', null); };
+        window.askDeleteRow = (id) => { if (isAdmin()) { currentDeleteId = id; document.getElementById('delete-modal').classList.remove('hidden'); } };
+        
+        document.getElementById('cancel-delete').addEventListener('click', () => { document.getElementById('delete-modal').classList.add('hidden'); });
         document.getElementById('confirm-delete').addEventListener('click', async () => {
             if (!currentDeleteId) return;
             try {
@@ -341,48 +298,43 @@
         });
 
         const buildRow = (item, isAbril) => {
-            const canDelete = (activeUser === 'sjemartinez' || activeUser === 'sjjardon');
+            const admin = isAdmin();
             return `
-            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 group" data-id="${item.id}">
+            <tr class="hover:bg-slate-50 border-b border-slate-100" data-id="${item.id}">
                 ${isAbril ? `
-                    <td class="p-5 border-r font-black text-coosajo-blue text-xs">${item.fecha}</td>
-                    <td class="p-5 border-r text-slate-700 text-[10px] font-black uppercase leading-tight">${item.eje}</td>
-                    <td class="p-5 border-r text-slate-600 italic text-xs leading-relaxed">"${item.frase}"</td>
+                    <td class="p-4 border-r font-bold text-coosajo-blue text-[10px]">${item.fecha}</td>
+                    <td class="p-4 border-r text-slate-700 text-[9px] font-black uppercase">${item.eje}</td>
+                    <td class="p-4 border-r text-slate-600 italic text-[11px]">"${item.frase}"</td>
                 ` : `
-                    <td class="p-5 border-r text-slate-600 italic text-xs leading-relaxed">"${item.frase}"</td>
-                    <td class="p-5 border-r text-slate-700 text-[10px] font-medium leading-tight">${item.copy}</td>
+                    <td class="p-4 border-r text-slate-600 italic text-[11px]">"${item.frase}"</td>
+                    <td class="p-4 border-r text-slate-700 text-[10px] font-medium leading-tight">${item.copy}</td>
                 `}
-                
-                <td class="p-5 border-r align-top">
-                    <select id="st-${item.id}" onchange="window.saveData('${item.id}', 'status', this.value)"
-                        class="w-full border border-slate-200 rounded-xl p-3 text-[10px] font-black uppercase focus:ring-2 focus:ring-coosajo-blue cursor-pointer bg-slate-50">
+                <td class="p-3 border-r align-top text-center">
+                    <select id="st-${item.id}" ${!admin ? 'disabled' : ''} onchange="window.saveData('${item.id}', 'status', this.value)"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-[10px] font-bold uppercase bg-white">
                         <option value="publicado_igual">🔵 Publicado Igual</option>
                         <option value="modificado">🟢 Modificado</option>
                         <option value="no_publicado">⚪ No publicado</option>
                     </select>
                 </td>
-
-                <td class="p-5 border-r align-top">
-                    <textarea id="rs-${item.id}" rows="2" placeholder="Explicación o justificante..."
+                <td class="p-3 border-r align-top">
+                    <textarea id="rs-${item.id}" ${!admin ? 'disabled' : ''} placeholder="${admin ? 'Justificante...' : ''}"
                         oninput="window.autoResize(this); window.saveData('${item.id}', 'reason', this.value)"
-                        class="w-full bg-slate-50 border border-slate-200 p-4 text-xs rounded-2xl focus:ring-2 focus:ring-coosajo-green font-medium"></textarea>
+                        class="w-full bg-slate-50 border border-slate-200 p-3 text-[11px] rounded-xl outline-none focus:ring-2 focus:ring-coosajo-green font-medium"></textarea>
                 </td>
-
-                <td class="p-5 align-top text-center relative">
+                <td class="p-3 align-top text-center relative">
                     <div class="flex flex-col gap-2">
-                        <label class="no-print cursor-pointer bg-[#1e293b] hover:bg-slate-900 text-white text-[10px] py-3 px-2 rounded-xl block transition active:scale-95 font-black uppercase">
-                            Subir Foto
+                        ${admin ? `<label class="no-print cursor-pointer bg-coosajo-blue text-white text-[9px] py-2 px-1 rounded-lg font-black uppercase shadow-md active:scale-95">
+                            FOTO
                             <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
-                        </label>
+                        </label>` : ''}
+                        
                         <div id="img-box-${item.id}" class="hidden">
-                            <img id="img-${item.id}" src="" class="w-full max-h-32 object-contain border rounded-2xl mx-auto shadow-md bg-white">
-                            <button class="no-print text-[10px] text-red-500 font-black uppercase mt-2" onclick="window.delImg('${item.id}')">Eliminar Imagen</button>
+                            <img id="img-${item.id}" src="" class="w-full max-h-24 object-contain border rounded-xl shadow-sm bg-white mb-1">
+                            ${admin ? `<button class="no-print text-[8px] text-red-500 font-bold uppercase hover:underline" onclick="window.delImg('${item.id}')">Quitar Foto</button>` : ''}
                         </div>
-                        ${canDelete ? `
-                        <button onclick="window.askDeleteRow('${item.id}')" 
-                                class="no-print mt-4 flex items-center justify-center gap-1 text-[9px] text-red-600 border border-red-200 bg-red-50 py-2 rounded-lg font-bold hover:bg-red-100 uppercase transition">
-                            Borrar Fila
-                        </button>` : ''}
+                        
+                        ${admin ? `<button onclick="window.askDeleteRow('${item.id}')" class="no-print mt-4 text-[8px] text-white bg-red-500 py-1.5 rounded-lg font-bold uppercase shadow-sm active:scale-95">BORRAR FILA</button>` : ''}
                     </div>
                 </td>
             </tr>
@@ -396,26 +348,22 @@
             marzoData.forEach(i => tbM.innerHTML += buildRow(i, false));
         }
 
+        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const u = document.getElementById('username').value.trim();
+            const u = document.getElementById('username').value.trim().toLowerCase();
             const p = document.getElementById('password').value.trim();
-            const validUsers = ['sjemartinez', 'sjjardon'];
-            if (!validUsers.includes(u) || p !== 'Coosajo2041') {
-                document.getElementById('login-error').innerText = "ERROR DE USUARIO"; 
-                document.getElementById('login-error').classList.remove('hidden'); return;
-            }
-            try {
+            if ((u === 'sjemartinez' || u === 'sjjardon') && p === 'Coosajo2041') {
                 await signInAnonymously(auth);
-                activeUser = u;
-                document.getElementById('user-display-name').innerText = "Sesión: " + u;
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('app-view').classList.remove('hidden');
-                initializeUI();
-            } catch (err) { console.error(err); }
+                localStorage.setItem('elian_user_id', u);
+                location.reload(); 
+            } else {
+                document.getElementById('login-error').innerText = "CREDENCIALES INCORRECTAS";
+                document.getElementById('login-error').classList.remove('hidden');
+            }
         });
 
-        document.getElementById('btn-logout').addEventListener('click', () => signOut(auth).then(() => location.reload()));
+        document.getElementById('btn-logout').addEventListener('click', () => { signOut(auth); localStorage.removeItem('elian_user_id'); location.reload(); });
         document.getElementById('btn-export').addEventListener('click', () => window.print());
         document.getElementById('monthFilter').addEventListener('change', (e) => {
             const v = e.target.value;
@@ -424,32 +372,48 @@
         });
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {
+            // VERIFICACIÓN MEJORADA: Si hay un usuario en localStorage, cargar info
+            if (user && localUser !== "") {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('app-view').classList.remove('hidden');
+                document.getElementById('user-label').innerText = "Usuario: " + localUser;
+                document.getElementById('user-role-tag').innerText = isAdmin() ? "Modo Administrador" : "Modo Lectura";
+                
+                initializeUI();
+                
                 const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'registros');
-                unsubscribeSnapshot = onSnapshot(postsRef, (snapshot) => {
+                onSnapshot(postsRef, (snapshot) => {
                     document.getElementById('loading-indicator').classList.add('hidden');
                     document.getElementById('tables-container').classList.remove('hidden');
+                    
                     snapshot.docChanges().forEach((change) => {
-                        const data = change.doc.data(); const id = change.doc.id;
+                        const data = change.doc.data();
+                        const id = change.doc.id;
                         const tr = document.querySelector(`tr[data-id="${id}"]`);
-                        if (data.deleted === true) { if (tr) tr.classList.add('hidden'); return; }
-                        else if (tr) tr.classList.remove('hidden');
                         
+                        if (data.deleted) { if (tr) tr.classList.add('hidden'); return; }
+                        else if (tr) tr.classList.remove('hidden');
+
                         const st = document.getElementById(`st-${id}`);
                         if (st && st.value !== data.status) st.value = data.status || 'publicado_igual';
+                        
                         const rs = document.getElementById(`rs-${id}`);
-                        if (rs && document.activeElement !== rs) { rs.value = data.reason || ''; window.autoResize(rs); }
-                        const imgBox = document.getElementById(`img-box-${id}`); const img = document.getElementById(`img-${id}`);
+                        if (rs) { 
+                            rs.value = data.reason || ''; 
+                            rs.style.height = 'auto'; rs.style.height = rs.scrollHeight + 'px';
+                        }
+                        
+                        const imgBox = document.getElementById(`img-box-${id}`);
+                        const img = document.getElementById(`img-${id}`);
                         if (data.image) {
                             if(img) img.src = data.image; if(imgBox) imgBox.classList.remove('hidden');
                         } else {
                             if(img) img.src = ''; if(imgBox) imgBox.classList.add('hidden');
                         }
                     });
-                });
+                }, (err) => console.error("Error Firebase:", err));
             } else {
                 document.getElementById('login-view').classList.remove('hidden');
-                document.getElementById('app-view').classList.add('hidden');
             }
         });
     </script>
