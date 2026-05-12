@@ -110,44 +110,41 @@
 
         <main class="max-w-[1600px] mx-auto px-2 md:px-4 py-6 w-full flex-1">
             
-            <!-- PANEL DE ESTADÍSTICAS (Dashbord con porcentajes) -->
+            <!-- PANEL DE ESTADÍSTICAS (Actualizado con lógica de 100%) -->
             <div id="dashboard-view" class="mb-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Gráfica Marzo -->
                 <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200 flex flex-col items-center">
                     <h3 class="text-sm font-black text-coosajo-blue uppercase mb-4">Efectividad Marzo</h3>
                     <div class="chart-container">
                         <canvas id="chartMarzo"></canvas>
                     </div>
-                    <div id="stats-marzo" class="mt-4 flex gap-4 text-[10px] font-black uppercase tracking-tighter">
+                    <div class="mt-4 flex gap-4 text-[10px] font-black uppercase tracking-tighter">
                         <div class="flex items-center gap-1"><span class="w-2 h-2 bg-coosajo-green rounded-full"></span> Publicado: <span id="p-marzo">0%</span></div>
                         <div class="flex items-center gap-1"><span class="w-2 h-2 bg-slate-300 rounded-full"></span> No Publicado: <span id="np-marzo">0%</span></div>
                     </div>
                 </div>
 
-                <!-- Gráfica Abril -->
                 <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200 flex flex-col items-center">
                     <h3 class="text-sm font-black text-coosajo-blue uppercase mb-4">Efectividad Abril</h3>
                     <div class="chart-container">
                         <canvas id="chartAbril"></canvas>
                     </div>
-                    <div id="stats-abril" class="mt-4 flex gap-4 text-[10px] font-black uppercase tracking-tighter">
+                    <div class="mt-4 flex gap-4 text-[10px] font-black uppercase tracking-tighter">
                         <div class="flex items-center gap-1"><span class="w-2 h-2 bg-coosajo-green rounded-full"></span> Publicado: <span id="p-abril">0%</span></div>
                         <div class="flex items-center gap-1"><span class="w-2 h-2 bg-slate-300 rounded-full"></span> No Publicado: <span id="np-abril">0%</span></div>
                     </div>
                 </div>
 
-                <!-- NOTA TÉCNICA -->
                 <div class="md:col-span-2 bg-slate-50 border border-slate-200 p-5 rounded-2xl">
-                    <h4 class="text-[10px] font-black text-coosajo-blue uppercase mb-2">Justificación de Registros Modificados:</h4>
+                    <h4 class="text-[10px] font-black text-coosajo-blue uppercase mb-2">Justificación de Registros:</h4>
                     <p class="text-[11px] text-slate-500 leading-relaxed font-medium italic">
-                        "Se hace constar que los registros categorizados como <span class="text-coosajo-green font-bold">MODIFICADOS</span> se incluyen en el porcentaje de publicaciones exitosas. Estas modificaciones se realizaron bajo criterio técnico de Vinculación Social debido a que las frases originales excedían la extensión permitida para optimizar el impacto visual o no se ajustaban íntegramente a los lineamientos de comunicación digital requeridos al momento de la publicación."
+                        "Los registros marcados como <span class="text-coosajo-green font-bold">MODIFICADOS</span> se incluyen en el porcentaje de publicaciones exitosas. Estos responden a ajustes técnicos por extensión de frases o alineación con requerimientos de marca."
                     </p>
                 </div>
             </div>
 
             <div id="loading-indicator" class="text-center py-20">
                 <div class="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-coosajo-green border-r-transparent"></div>
-                <p class="mt-4 text-coosajo-blue font-black uppercase text-[10px] tracking-widest">Sincronizando con Firebase...</p>
+                <p class="mt-4 text-coosajo-blue font-black uppercase text-[10px] tracking-widest">Sincronizando registros...</p>
             </div>
 
             <div id="tables-container" class="hidden space-y-16">
@@ -227,9 +224,8 @@
 
         let chartM = null;
         let chartA = null;
-        let debounceTimers = {};
-        let currentDeleteId = null;
         let localUser = localStorage.getItem('elian_user_id') || "";
+        let dbStatuses = {}; // Caché local de estados para cálculo de gráfica
 
         const isAdmin = () => localUser === 'sjemartinez';
 
@@ -290,19 +286,73 @@
             { id: "M35", frase: "Cada cultivo cuenta una historia de esfuerzo, disciplina y aprendizaje.", copy: "Apoyo a agricultores para mejorar su producción." }
         ];
 
-        // FUNCIONES
-        window.saveData = async (id, type, value) => {
-            if (!isAdmin()) return; 
-            clearTimeout(debounceTimers[`${id}_${type}`]);
-            debounceTimers[`${id}_${type}`] = setTimeout(async () => {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'registros', id);
-                    await setDoc(docRef, { [type]: value }, { merge: true });
-                } catch (err) { console.error(err); }
-            }, 500);
+        // LÓGICA DE GRÁFICAS REFORZADA
+        const initCharts = () => {
+            const config = {
+                type: 'pie',
+                data: {
+                    labels: ['Publicado', 'No publicado'],
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: ['#158e45', '#e2e8f0'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            };
+            chartM = new Chart(document.getElementById('chartMarzo'), JSON.parse(JSON.stringify(config)));
+            chartA = new Chart(document.getElementById('chartAbril'), JSON.parse(JSON.stringify(config)));
         };
 
-        window.autoResize = (el) => { if(!el) return; el.style.height = 'auto'; el.style.height = (el.scrollHeight) + 'px'; };
+        const updateStats = () => {
+            const processMonth = (dataArray, prefix) => {
+                let pub = 0;
+                let activeRows = 0;
+
+                dataArray.forEach(item => {
+                    const saved = dbStatuses[item.id];
+                    if (saved && saved.deleted) return; // Ignorar borradas
+                    activeRows++;
+                    
+                    // Si no hay dato en DB, el default de la tabla es "publicado_igual"
+                    const status = (saved && saved.status) ? saved.status : 'publicado_igual';
+                    
+                    if (status === 'publicado_igual' || status === 'modificado') {
+                        pub++;
+                    }
+                });
+
+                const total = activeRows || 1;
+                const p = Math.round((pub / total) * 100);
+                const np = 100 - p;
+
+                document.getElementById(`p-${prefix}`).innerText = `${p}% (${pub})`;
+                document.getElementById(`np-${prefix}`).innerText = `${np}% (${total - pub})`;
+
+                const chart = prefix === 'marzo' ? chartM : chartA;
+                if (chart) {
+                    chart.data.datasets[0].data = [pub, total - pub];
+                    chart.update();
+                }
+            };
+
+            processMonth(marzoData, 'marzo');
+            processMonth(abrilData, 'abril');
+        };
+
+        // UI Y EVENTOS
+        window.saveData = async (id, type, value) => {
+            if (!isAdmin()) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'registros', id);
+                await setDoc(docRef, { [type]: value }, { merge: true });
+            } catch (err) { console.error(err); }
+        };
 
         window.uploadImg = (event, id) => {
             if (!isAdmin()) return;
@@ -340,65 +390,6 @@
             } catch (err) { console.error(err); }
         });
 
-        // LÓGICA DE GRÁFICAS CON PORCENTAJES
-        const initCharts = () => {
-            const config = {
-                type: 'pie',
-                data: {
-                    labels: ['Publicado', 'No publicado'],
-                    datasets: [{
-                        data: [0, 100],
-                        backgroundColor: ['#158e45', '#e2e8f0'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            };
-            chartM = new Chart(document.getElementById('chartMarzo'), JSON.parse(JSON.stringify(config)));
-            chartA = new Chart(document.getElementById('chartAbril'), JSON.parse(JSON.stringify(config)));
-        };
-
-        const updateStats = (docs) => {
-            const totals = { 
-                M: { pub: 0, total: marzoData.length }, 
-                A: { pub: 0, total: abrilData.length } 
-            };
-            
-            docs.forEach(d => {
-                const data = d.data();
-                if (data.deleted) return;
-                const prefix = d.id.charAt(0);
-                if (totals[prefix] && (data.status === 'publicado_igual' || data.status === 'modificado')) {
-                    totals[prefix].pub++;
-                }
-            });
-
-            // Actualizar Marzo
-            const pMarzo = Math.round((totals.M.pub / totals.M.total) * 100);
-            document.getElementById('p-marzo').innerText = pMarzo + "% (" + totals.M.pub + ")";
-            document.getElementById('np-marzo').innerText = (100 - pMarzo) + "% (" + (totals.M.total - totals.M.pub) + ")";
-            if(chartM) {
-                chartM.data.datasets[0].data = [totals.M.pub, totals.M.total - totals.M.pub];
-                chartM.update();
-            }
-
-            // Actualizar Abril
-            const pAbril = Math.round((totals.A.pub / totals.A.total) * 100);
-            document.getElementById('p-abril').innerText = pAbril + "% (" + totals.A.pub + ")";
-            document.getElementById('np-abril').innerText = (100 - pAbril) + "% (" + (totals.A.total - totals.A.pub) + ")";
-            if(chartA) {
-                chartA.data.datasets[0].data = [totals.A.pub, totals.A.total - totals.A.pub];
-                chartA.update();
-            }
-        };
-
         const buildRow = (item, isAbril) => {
             const admin = isAdmin();
             return `
@@ -421,7 +412,7 @@
                 </td>
                 <td class="p-3 border-r align-top">
                     <textarea id="rs-${item.id}" ${!admin ? 'disabled' : ''} placeholder="${admin ? 'Justificante...' : ''}"
-                        oninput="window.autoResize(this); window.saveData('${item.id}', 'reason', this.value)"
+                        oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'; window.saveData('${item.id}', 'reason', this.value)"
                         class="w-full bg-slate-50 border border-slate-200 p-3 text-[11px] rounded-xl outline-none focus:ring-2 focus:ring-coosajo-green font-medium"></textarea>
                 </td>
                 <td class="p-3 align-top text-center relative">
@@ -430,24 +421,26 @@
                             FOTO
                             <input type="file" accept="image/*" class="hidden" onchange="window.uploadImg(event, '${item.id}')">
                         </label>` : ''}
+                        
                         <div id="img-box-${item.id}" class="hidden">
                             <img id="img-${item.id}" src="" class="w-full max-h-24 object-contain border rounded-xl shadow-sm bg-white mb-1">
                             ${admin ? `<button class="no-print text-[8px] text-red-500 font-bold uppercase hover:underline" onclick="window.delImg('${item.id}')">Quitar</button>` : ''}
                         </div>
-                        ${admin ? `<button onclick="window.askDeleteRow('${item.id}')" class="no-print mt-4 text-[8px] text-white bg-red-500 py-1.5 rounded-lg font-bold uppercase shadow-sm">ELIMINAR</button>` : ''}
+                        
+                        ${admin ? `<button onclick="window.askDeleteRow('${item.id}')" class="no-print mt-4 text-[8px] text-white bg-red-500 py-1.5 rounded-lg font-bold uppercase shadow-sm">BORRAR FILA</button>` : ''}
                     </div>
                 </td>
             </tr>
         `;};
 
-        function initializeUI() {
+        const initializeUI = () => {
             const tbA = document.getElementById('abril-tbody');
             const tbM = document.getElementById('marzo-tbody');
             tbA.innerHTML = ""; tbM.innerHTML = "";
             abrilData.forEach(i => tbA.innerHTML += buildRow(i, true));
             marzoData.forEach(i => tbM.innerHTML += buildRow(i, false));
             initCharts();
-        }
+        };
 
         // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -459,7 +452,7 @@
                 localStorage.setItem('elian_user_id', u);
                 location.reload(); 
             } else {
-                document.getElementById('login-error').innerText = "CREDENCIALES INCORRECTAS";
+                document.getElementById('login-error').innerText = "DATOS INCORRECTOS";
                 document.getElementById('login-error').classList.remove('hidden');
             }
         });
@@ -486,7 +479,12 @@
                     document.getElementById('loading-indicator').classList.add('hidden');
                     document.getElementById('tables-container').classList.remove('hidden');
                     
-                    updateStats(snapshot);
+                    snapshot.docs.forEach(d => {
+                        dbStatuses[d.id] = d.data();
+                    });
+
+                    // Actualizar las gráficas basándose en los datos actuales + defaults
+                    updateStats();
 
                     snapshot.docChanges().forEach((change) => {
                         const data = change.doc.data();
